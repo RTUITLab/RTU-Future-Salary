@@ -66,7 +66,7 @@ class DataView(APIView):
         elif status == 'Docent':
             salary = rate * DOCENT_SALARIES[age_i]
         else:
-            print('ERROR')
+            salary = 'ERROR with calculation salary'
 
         return salary
 
