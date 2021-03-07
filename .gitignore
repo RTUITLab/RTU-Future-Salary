@@ -5,4 +5,4 @@ venv
 META
 frontend
 desktop.ini
-*.sqlite3
+db.sqlite3

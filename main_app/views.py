@@ -25,23 +25,23 @@ class DataView(APIView):
     ...
     """
 
-    def get_user_age_group(self, date_of_birth):
-        age = datetime.now() - date_of_birth
+    def get_user_age_group(self, date_of_birth, temp_date):
+        temp_age = temp_date - date_of_birth
 
-        if age.days <= (365 * 30):
-            age_i = 0
-        elif (365 * 30) < age.days <= (365 * 34):
-            age_i = 1
-        elif (365 * 34) < age.days <= (365 * 39):
-            age_i = 2
-        elif (365 * 39) < age.days <= (365 * 44):
-            age_i = 3
+        if temp_age.days <= (365 * 30):
+            age_group = 0
+        elif (365 * 30) < temp_age.days <= (365 * 34):
+            age_group = 1
+        elif (365 * 34) < temp_age.days <= (365 * 39):
+            age_group = 2
+        elif (365 * 39) < temp_age.days <= (365 * 44):
+            age_group = 3
         else:
-            age_i = 4
+            age_group = 4
 
-        return age_i
+        return age_group
 
-    def calculate_month_salary(self, user, current_month):
+    def calculate_month_salary(self, user, temp_date):
 
         academic_degree = user['academic_degree']
         work_experience = user['work_experience']
@@ -55,7 +55,7 @@ class DataView(APIView):
         else:
             rate = -1
 
-        age_i = self.get_user_age_group(date_of_birth)
+        age_i = self.get_user_age_group(date_of_birth, temp_date)
 
         if datetime.now() < date_of_dissertation_defense:
             is_docent = False
@@ -79,6 +79,8 @@ class DataView(APIView):
         else:
             salary = 'ERROR with calculation salary'
 
+        current_month = temp_date.month
+
         if (current_month == 7 or current_month == 8) and academic_degree == 'Master':
             return 0
         else:
@@ -101,13 +103,15 @@ class DataView(APIView):
 
         current_year = user['date_of_registration'].year
         current_month = user['date_of_registration'].month
+        current_day = user['date_of_registration'].day
 
         if datetime.now() < user['date_of_dissertation_defense']:
             for i in range(months):
+                temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
                 month_data = {
                     'year': current_year,
                     'month': current_month,
-                    'salary': self.calculate_month_salary(user, current_month)
+                    'salary': self.calculate_month_salary(user, temp_date)
                 }
                 data.append(month_data)
 
@@ -125,10 +129,11 @@ class DataView(APIView):
                     current_month += 1
 
         for i in range(3):
+            temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
             month_data = {
                 'year': current_year,
                 'month': current_month,
-                'salary': DOCENT_SALARIES[self.get_user_age_group(user['date_of_birth'])]
+                'salary': DOCENT_SALARIES[self.get_user_age_group(user['date_of_birth'], temp_date)]
             }
             data.append(month_data)
             if current_month == 12:
