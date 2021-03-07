@@ -30,13 +30,13 @@ class CalculateView(APIView):
 
         temp_age_days = temp_age.days - 30
 
-        if temp_age_days.days < (365 * 31):
+        if temp_age_days < (365 * 31):
             age_group = 0
-        elif (365 * 31) <= temp_age_days.days < (365 * 35):
+        elif (365 * 31) <= temp_age_days< (365 * 35):
             age_group = 1
-        elif (365 * 35) <= temp_age_days.days < (365 * 40):
+        elif (365 * 35) <= temp_age_days < (365 * 40):
             age_group = 2
-        elif (365 * 40) <= temp_age_days.days < (365 * 45):
+        elif (365 * 40) <= temp_age_days < (365 * 45):
             age_group = 3
         else:
             age_group = 4
