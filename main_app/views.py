@@ -28,16 +28,20 @@ class CalculateView(APIView):
     def get_user_age_group(self, date_of_birth, temp_date):
         temp_age = temp_date - date_of_birth
 
-        if temp_age.days <= (365 * 30):
+        print(temp_age.days)
+
+        if temp_age.days < (365 * 31):
             age_group = 0
-        elif (365 * 30) < temp_age.days <= (365 * 34):
+        elif (365 * 31) <= temp_age.days < (365 * 35):
             age_group = 1
-        elif (365 * 34) < temp_age.days <= (365 * 39):
+        elif (365 * 35) <= temp_age.days < (365 * 40):
             age_group = 2
-        elif (365 * 39) < temp_age.days <= (365 * 44):
+        elif (365 * 40) <= temp_age.days < (365 * 45):
             age_group = 3
         else:
             age_group = 4
+
+        print(age_group)
 
         return age_group
 
@@ -116,6 +120,7 @@ class CalculateView(APIView):
                 data.append(month_data)
 
                 user['work_experience'] += 1
+
                 if current_month == 8 and user['academic_degree'] == 'Master' and user['academic_degree_course'] == 1:
                     user['academic_degree_course'] = 2
                 elif current_month == 8 and user['academic_degree'] == 'Master' and user['academic_degree_course'] == 2:
