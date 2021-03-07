@@ -26,7 +26,7 @@ class CalculateView(APIView):
     """
 
     def get_user_age_group(self, date_of_birth, temp_date):
-        temp_age = temp_date - date_of_birth
+        temp_age = temp_date - date_of_birth - 30
 
         print(temp_age.days)
 
