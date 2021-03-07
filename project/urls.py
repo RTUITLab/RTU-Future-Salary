@@ -21,5 +21,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
 
     #
-    path('api/data', views.DataView.as_view()),
+    path('api/data', views.CalculateView.as_view()),
 ]

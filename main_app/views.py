@@ -20,9 +20,9 @@ DOCENT_SALARIES = [
 ]
 
 
-class DataView(APIView):
+class CalculateView(APIView):
     """
-    ...
+    Calculates salary
     """
 
     def get_user_age_group(self, date_of_birth, temp_date):
