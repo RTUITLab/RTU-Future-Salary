@@ -117,7 +117,10 @@ class CalculateView(APIView):
                 }
                 data.append(month_data)
 
-                user['work_experience'] += 1
+                if (current_month == 7 or current_month == 8) and user['academic_degree'] == 'Master':
+                    pass
+                else:
+                    user['work_experience'] += 1
 
                 if current_month == 8 and user['academic_degree'] == 'Master' and user['academic_degree_course'] == 1:
                     user['academic_degree_course'] = 2
