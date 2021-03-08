@@ -169,7 +169,10 @@ class CalculateView(APIView):
                 else:
                     current_month += 1
 
-        for i in range(3):
+        years_gone = current_year - user['date_of_birth'].year
+        years_required = 33 - years_gone
+        print('docent')
+        for i in range(years_required * 12):
             temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
             month_data = {
                 'academic_degree': user['academic_degree'],
@@ -179,6 +182,8 @@ class CalculateView(APIView):
                 'salary': DOCENT_SALARIES[self.get_user_age_group(user['date_of_birth'], temp_date)]
             }
             data.append(month_data)
+            print(
+                f"{current_month}.{current_year}: \t{user['academic_degree']} {user['academic_degree_course']}\t{month_data['salary']}")
             if current_month == 12:
                 current_month = 1
                 current_year += 1
