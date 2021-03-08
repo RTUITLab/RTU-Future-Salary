@@ -2,6 +2,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from .models import *
 from datetime import datetime
+import os
+from django.views.generic.base import View
+from django.http import HttpResponse
 
 # MONTHS = [
 #     'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июль', '', '', '', '', '',
@@ -32,7 +35,7 @@ class CalculateView(APIView):
 
         if temp_age_days < (365 * 31):
             age_group = 0
-        elif (365 * 31) <= temp_age_days< (365 * 35):
+        elif (365 * 31) <= temp_age_days < (365 * 35):
             age_group = 1
         elif (365 * 35) <= temp_age_days < (365 * 40):
             age_group = 2
@@ -50,9 +53,13 @@ class CalculateView(APIView):
         date_of_birth = user['date_of_birth']
         date_of_dissertation_defense = user['date_of_dissertation_defense']
 
-        if academic_degree == 'Master':
+        if academic_degree == 'Specialist':
+            rate = 0
+        elif academic_degree == 'Master':
             rate = 0.5
-        elif academic_degree == 'PreСandidate':
+        elif academic_degree == 'PreCandidate':
+            rate = 1
+        elif academic_degree == 'Docent':
             rate = 1
         else:
             rate = -1
@@ -109,24 +116,52 @@ class CalculateView(APIView):
 
         if datetime.now() < user['date_of_dissertation_defense']:
             for i in range(months):
+
                 temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
                 month_data = {
+                    'academic_degree': user['academic_degree'],
+                    'academic_degree_course': user['academic_degree_course'],
                     'year': current_year,
                     'month': current_month,
                     'salary': self.calculate_month_salary(user, temp_date)
                 }
                 data.append(month_data)
+                print(
+                    f"{current_month}.{current_year}: \t{user['academic_degree']} {user['academic_degree_course']}\t{month_data['salary']}")
 
                 if (current_month == 7 or current_month == 8) and user['academic_degree'] == 'Master':
                     pass
                 else:
                     user['work_experience'] += 1
 
-                if current_month == 8 and user['academic_degree'] == 'Master' and user['academic_degree_course'] == 1:
+                if current_month == 8 \
+                        and user['academic_degree'] == 'Master' \
+                        and user['academic_degree_course'] == 1:
                     user['academic_degree_course'] = 2
-                elif current_month == 8 and user['academic_degree'] == 'Master' and user['academic_degree_course'] == 2:
-                    user['academic_degree'] = 'PreСandidate'
-                    user['academic_degree_course'] = 1
+                elif current_month == 8 \
+                        and user['academic_degree'] == 'Master' \
+                        and user['academic_degree_course'] == 2:
+                    user['academic_degree'] = 'PreCandidate'
+                    user['academic_degree_course'] = 0
+
+                if current_month == 8 \
+                        and user['academic_degree'] == 'Specialist' \
+                        and user['academic_degree_course'] != 5:
+                    user['academic_degree_course'] += 1
+                elif current_month == 8 \
+                        and user['academic_degree'] == 'Specialist' \
+                        and user['academic_degree_course'] == 5:
+                    user['academic_degree'] = 'PreCandidate'
+                    user['academic_degree_course'] = 0
+
+                if current_month == 8 \
+                        and user['academic_degree'] == 'PreCandidate' \
+                        and user['academic_degree_course'] != 4:
+                    user['academic_degree_course'] += 1
+                elif current_month == 8 \
+                        and user['academic_degree'] == 'PreCandidate' \
+                        and user['academic_degree_course'] == 4:
+                    user['academic_degree'] = 'Docent'
 
                 if current_month == 12:
                     current_month = 1
@@ -137,6 +172,8 @@ class CalculateView(APIView):
         for i in range(3):
             temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
             month_data = {
+                'academic_degree': user['academic_degree'],
+                'academic_degree_course': user['academic_degree_course'],
                 'year': current_year,
                 'month': current_month,
                 'salary': DOCENT_SALARIES[self.get_user_age_group(user['date_of_birth'], temp_date)]
@@ -148,4 +185,34 @@ class CalculateView(APIView):
             else:
                 current_month += 1
 
-        return Response(data)
+        end_data = list()
+        for el in data:
+            if el['academic_degree'] != 'Specialist':
+                end_data.append(el)
+
+        # temp_sum = 0
+        # temp_months = 0
+        # for el in data:
+        #     temp_sum += el['salary']
+        #     temp_months += 1
+        #     print('Worked ', temp_months, ' months (', int(temp_months/12), 'years)\t Got ', temp_sum)
+
+        return Response(end_data)
+
+
+class ReactAppView(View):
+
+    def get(self, request):
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        try:
+            with open(os.path.join(BASE_DIR, 'frontend', 'build', 'index.html')) as file:
+                return HttpResponse(file.read())
+
+        except:
+            return HttpResponse(
+                """
+                File index.html not found ! Build your React app !
+                """,
+                status=501,
+            )

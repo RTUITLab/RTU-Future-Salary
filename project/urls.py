@@ -16,10 +16,13 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 import main_app.views as views
+from django.conf.urls import url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     #
-    path('api/data', views.CalculateView.as_view()),
+    path('api/calculate', views.CalculateView.as_view()),
 ]
+
+urlpatterns += [url(r'^', views.ReactAppView.as_view())]
