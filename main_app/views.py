@@ -18,7 +18,11 @@ TEACHER_SALARIES = [
     109986, 93065, 84605, 84605, 84605,
 ]
 
-DOCENT_SALARIES = [
+TEACHER_K_N_SALARIES = [
+    121824, 117312, 99264, 90240, 90240,
+]
+
+DOCENT_K_N_SALARIES = [
     142130, 121826, 111674, 101522, 101522,
 ]
 
@@ -28,10 +32,19 @@ class CalculateView(APIView):
     Calculates salary
     """
 
-    def get_user_age_group(self, date_of_birth, temp_date):
-        temp_age = temp_date - date_of_birth
+    class User:
+        def __init__(self, academic_status, academic_course, date_of_registration, work_experience,
+                     date_of_dissertation, date_of_birth):
+            self.academic_status = academic_status
+            self.academic_course = academic_course
+            self.date_of_registration = date_of_registration
+            self.work_experience = work_experience
+            self.date_of_dissertation = date_of_dissertation
+            self.date_of_birth = date_of_birth
 
-        temp_age_days = temp_age.days - 30
+    def get_user_age_group(self, temp_date, date_of_birth):
+        temp_age = temp_date - date_of_birth
+        temp_age_days = temp_age.days - 30  # округление в меньшую
 
         if temp_age_days < (365 * 31):
             age_group = 0
@@ -48,176 +61,172 @@ class CalculateView(APIView):
 
     def calculate_month_salary(self, user, temp_date):
 
-        academic_degree = user['academic_degree']
-        work_experience = user['work_experience']
-        date_of_birth = user['date_of_birth']
-        date_of_dissertation_defense = user['date_of_dissertation_defense']
+        # academic_degree = user['academic_degree']
+        # work_experience = user['work_experience']
+        # date_of_birth = user['date_of_birth']
+        # date_of_dissertation_defense = user['date_of_dissertation_defense']
 
-        if academic_degree == 'Specialist':
+        if user.academic_status == 'Specialist':
             rate = 0
-        elif academic_degree == 'Master':
+        elif user.academic_status == 'Master':
             rate = 0.5
-        elif academic_degree == 'PreCandidate':
+        elif user.academic_status == 'PreCandidate':
             rate = 1
-        elif academic_degree == 'Docent':
+        elif user.academic_status == 'Graduate':
             rate = 1
         else:
             rate = -1
 
-        age_i = self.get_user_age_group(date_of_birth, temp_date)
+        age_group = self.get_user_age_group(temp_date, user.date_of_birth)
 
-        if temp_date < date_of_dissertation_defense:
-            is_docent = False
+        if user.work_experience >= 36:
+            has_work_experience = True
         else:
-            is_docent = True
+            has_work_experience = False
 
-        if work_experience >= 36:
-            if is_docent:
-                status = 'Docent'
-            else:
-                status = 'Teacher'
+        if temp_date > user.date_of_dissertation:
+            has_k_n = True
         else:
-            status = 'Assistant'
+            has_k_n = False
 
-        if status == 'Assistant':
-            salary = rate * ASSISTANT_SALARIES[age_i]
-        elif status == 'Teacher':
-            salary = rate * TEACHER_SALARIES[age_i]
-        elif status == 'Docent':
-            salary = rate * DOCENT_SALARIES[age_i]
+        if has_k_n is False and has_work_experience is False:
+            position = 'Assistant'
+        elif has_k_n is False and has_work_experience is True:
+            position = 'Teacher'
+        elif has_k_n is True and has_work_experience is False:
+            position = 'Teacher_k_n'
+        elif has_k_n is True and has_work_experience is True:
+            position = 'Docent_k_n'
         else:
-            salary = 'ERROR with calculation salary'
+            position = None
 
-        current_month = temp_date.month
+        if position == 'Assistant':
+            salary = rate * ASSISTANT_SALARIES[age_group]
+        elif position == 'Teacher':
+            salary = rate * TEACHER_SALARIES[age_group]
+        elif position == 'Teacher_k_n':
+            salary = rate * TEACHER_K_N_SALARIES[age_group]
+        elif position == 'Docent_k_n':
+            salary = rate * DOCENT_K_N_SALARIES[age_group]
+        else:
+            salary = None
 
-        if (current_month == 7 or current_month == 8) and academic_degree == 'Master':
+        # if temp_date < date_of_dissertation_defense:
+        #     has_k_n = False
+        # else:
+        #     has_k_n = True
+        #
+        # if work_experience >= 36:
+        #     if has_k_n:
+        #         status = 'Docent'
+        #     else:
+        #         status = 'Teacher'
+        # else:
+        #     status = 'Assistant'
+        #
+        # if status == 'Assistant':
+        #     salary = rate * ASSISTANT_SALARIES[age_i]
+        # elif status == 'Teacher':
+        #     salary = rate * TEACHER_SALARIES[age_i]
+        # elif status == 'Docent':
+        #     salary = rate * DOCENT_SALARIES[age_i]
+        # else:
+        #     salary = 'ERROR with calculation salary'
+        #
+        # current_month = temp_date.month
+        #
+        if (temp_date.month == 7 or temp_date.month == 8) and user.academic_status == 'Master':
             return 0
         else:
             return int(salary)
 
     def post(self, request):
-        user = {
-            'academic_degree': request.data['academic_degree'],
-            'academic_degree_course': int(request.data['academic_degree_course']),
-            'date_of_registration': datetime.strptime(request.data['date_of_registration'], '%Y-%m-%d'),
-            'work_experience': int(request.data['work_experience']),
-            'date_of_dissertation_defense': datetime.strptime(request.data['date_of_dissertation_defense'], '%Y-%m-%d'),
-            'date_of_birth': datetime.strptime(request.data['date_of_birth'], '%Y-%m-%d'),
-        }
 
+        user = self.User(
+            academic_status=request.data['academic_degree'],
+            academic_course=int(request.data['academic_degree_course']),
+            date_of_registration=datetime.strptime(request.data['date_of_registration'], '%Y-%m-%d'),
+            work_experience=int(request.data['work_experience']),
+            date_of_dissertation=datetime.strptime(request.data['date_of_dissertation_defense'], '%Y-%m-%d'),
+            date_of_birth=datetime.strptime(request.data['date_of_birth'], '%Y-%m-%d')
+        )
+
+        print(user.academic_status)
+
+        '''
+        1) вычислим статус на момент регистрации
+        2) вычислим карьеру с момента регистрации
+        '''
         data = list()
 
-        time_to_docent = user['date_of_dissertation_defense'] - datetime.now()
-        months = int(time_to_docent.days / 30 + 1)
+        before_time = user.date_of_registration - datetime.now()  # user.date_of_registration must be > datetime.now()
+        before_time = int(before_time.days / 30 + 1)
 
-        current_year = user['date_of_registration'].year
-        current_month = user['date_of_registration'].month
-        current_day = user['date_of_registration'].day
+        all_time = user.date_of_dissertation - datetime.now()  # user.date_of_dissertation must be > datetime.now()
+        all_time = int(all_time.days / 30 + 1)
 
-        if datetime.now() < user['date_of_dissertation_defense']:
-            for i in range(months):
+        current_year = datetime.now().year
+        current_month = datetime.now().month
+        current_day = datetime.now().day
 
-                temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
+        for i in range(all_time):
+            temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
+
+            if temp_date < user.date_of_registration:
+                print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
+            else:
+                print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
+
+            if temp_date > user.date_of_registration:
                 month_data = {
-                    'academic_degree': user['academic_degree'],
-                    'academic_degree_course': user['academic_degree_course'],
-                    'year': current_year,
-                    'month': current_month,
-                    'salary': self.calculate_month_salary(user, temp_date)
+                    'academic_status': user.academic_status,
+                    'academic_course': user.academic_course,
+                    'date': f'{current_year} {current_month}',
+                    'salary': self.calculate_month_salary(user, temp_date),
+                    'status_of_work_experience': user.work_experience >= 36,
+                    'status_of_age_group': self.get_user_age_group(temp_date, user.date_of_birth),
+                    'status_of_dissertation': temp_date > user.date_of_dissertation
                 }
-                data.append(month_data)
-                print(
-                    f"{current_month}.{current_year}: \t{user['academic_degree']} {user['academic_degree_course']}\t{month_data['salary']}")
-
-                if (current_month == 7 or current_month == 8) and user['academic_degree'] == 'Master':
+                print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
+                      month_data['status_of_dissertation'], month_data['salary'])
+                if (current_month == 7 or current_month == 8) and user.academic_status == 'Master':
                     pass
                 else:
-                    user['work_experience'] += 1
+                    user.work_experience += 1
 
-                if current_month == 8 \
-                        and user['academic_degree'] == 'Master' \
-                        and user['academic_degree_course'] == 1:
-                    user['academic_degree_course'] = 2
-                elif current_month == 8 \
-                        and user['academic_degree'] == 'Master' \
-                        and user['academic_degree_course'] == 2:
-                    user['academic_degree'] = 'PreCandidate'
-                    user['academic_degree_course'] = 0
+            if current_month == 8:
 
-                if current_month == 8 \
-                        and user['academic_degree'] == 'Specialist' \
-                        and user['academic_degree_course'] != 5:
-                    user['academic_degree_course'] += 1
-                elif current_month == 8 \
-                        and user['academic_degree'] == 'Specialist' \
-                        and user['academic_degree_course'] == 5:
-                    user['academic_degree'] = 'PreCandidate'
-                    user['academic_degree_course'] = 0
+                if user.academic_status == 'Master':
+                    if user.academic_course == 1:
+                        user.academic_course = 2
+                    elif user.academic_course == 2:
+                        user.academic_status = 'PreCandidate'
+                        user.academic_course = 0
 
-                if current_month == 8 \
-                        and user['academic_degree'] == 'PreCandidate' \
-                        and user['academic_degree_course'] != 4:
-                    user['academic_degree_course'] += 1
-                elif current_month == 8 \
-                        and user['academic_degree'] == 'PreCandidate' \
-                        and user['academic_degree_course'] == 4:
-                    user['academic_degree'] = 'Docent'
+                if user.academic_status == 'Specialist':
+                    if user.academic_course != 5:
+                        user.academic_course += 1
+                    elif user.academic_course == 5:
+                        user.academic_status = 'PreCandidate'
+                        user.academic_course = 0
 
-                if current_month == 12:
-                    current_month = 1
-                    current_year += 1
-                else:
-                    current_month += 1
+                if user.academic_status == 'PreCandidate':
+                    if user.academic_course != 4:
+                        user.academic_course += 1
+                    elif user.academic_course == 4:
+                        user.academic_status = 'Graduate'
+                        user.academic_course = None
 
-        years_gone = current_year - user['date_of_birth'].year
-        years_required = 33 - years_gone
-        print('docent')
-        for i in range(years_required * 12):
-            temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
-            month_data = {
-                'academic_degree': user['academic_degree'],
-                'academic_degree_course': user['academic_degree_course'],
-                'year': current_year,
-                'month': current_month,
-                'salary': DOCENT_SALARIES[self.get_user_age_group(user['date_of_birth'], temp_date)]
-            }
-            data.append(month_data)
-            print(
-                f"{current_month}.{current_year}: \t{user['academic_degree']} {user['academic_degree_course']}\t{month_data['salary']}")
             if current_month == 12:
                 current_month = 1
                 current_year += 1
             else:
                 current_month += 1
+        # all_time = user['date_of_dissertation_defense'] - datetime.now()
+        # all_time = int(all_time.days / 30 + 1)
+        # print(all_time)
+        #
+        # for i in range(all_time):
+        #     pass
 
-        end_data = list()
-        for el in data:
-            if el['academic_degree'] != 'Specialist':
-                end_data.append(el)
-
-        # temp_sum = 0
-        # temp_months = 0
-        # for el in data:
-        #     temp_sum += el['salary']
-        #     temp_months += 1
-        #     print('Worked ', temp_months, ' months (', int(temp_months/12), 'years)\t Got ', temp_sum)
-
-        return Response(end_data)
-
-
-class ReactAppView(View):
-
-    def get(self, request):
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-        try:
-            with open(os.path.join(BASE_DIR, 'frontend', 'build', 'index.html')) as file:
-                return HttpResponse(file.read())
-
-        except:
-            return HttpResponse(
-                """
-                File index.html not found ! Build your React app !
-                """,
-                status=501,
-            )
+        return Response(data)
