@@ -66,7 +66,7 @@ class CalculateView(APIView):
 
         age_i = self.get_user_age_group(date_of_birth, temp_date)
 
-        if datetime.now() < date_of_dissertation_defense:
+        if temp_date < date_of_dissertation_defense:
             is_docent = False
         else:
             is_docent = True
