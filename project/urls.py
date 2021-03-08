@@ -15,16 +15,16 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-import main_app.views_1 as views_1
+# import main_app.views_1 as views_1
 import main_app.views as views
 from django.conf.urls import url
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
-    #
-    path('api/calculate', views_1.CalculateView.as_view()),
-    path('api/calculate_dev', views.CalculateView.as_view()),
+    # Рассчитать зарплату
+    path('api/calculate', views.CalculateView.as_view()),
+    # path('api/calculate_dev', views.CalculateView.as_view()),
 ]
 
-urlpatterns += [url(r'^', views_1.ReactAppView.as_view())]
+# urlpatterns += [url(r'^', views_1.ReactAppView.as_view())]
