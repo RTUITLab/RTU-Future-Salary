@@ -61,11 +61,6 @@ class CalculateView(APIView):
 
     def calculate_month_salary(self, user, temp_date):
 
-        # academic_degree = user['academic_degree']
-        # work_experience = user['work_experience']
-        # date_of_birth = user['date_of_birth']
-        # date_of_dissertation_defense = user['date_of_dissertation_defense']
-
         if user.academic_status == 'Specialist':
             rate = 0
         elif user.academic_status == 'Master':
@@ -111,30 +106,6 @@ class CalculateView(APIView):
         else:
             salary = None
 
-        # if temp_date < date_of_dissertation_defense:
-        #     has_k_n = False
-        # else:
-        #     has_k_n = True
-        #
-        # if work_experience >= 36:
-        #     if has_k_n:
-        #         status = 'Docent'
-        #     else:
-        #         status = 'Teacher'
-        # else:
-        #     status = 'Assistant'
-        #
-        # if status == 'Assistant':
-        #     salary = rate * ASSISTANT_SALARIES[age_i]
-        # elif status == 'Teacher':
-        #     salary = rate * TEACHER_SALARIES[age_i]
-        # elif status == 'Docent':
-        #     salary = rate * DOCENT_SALARIES[age_i]
-        # else:
-        #     salary = 'ERROR with calculation salary'
-        #
-        # current_month = temp_date.month
-        #
         if (temp_date.month == 7 or temp_date.month == 8) and user.academic_status == 'Master':
             return 0
         else:
@@ -222,6 +193,7 @@ class CalculateView(APIView):
                 current_year += 1
             else:
                 current_month += 1
+
         # all_time = user['date_of_dissertation_defense'] - datetime.now()
         # all_time = int(all_time.days / 30 + 1)
         # print(all_time)
