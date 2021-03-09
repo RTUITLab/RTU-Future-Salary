@@ -140,6 +140,7 @@ class CalculateView(APIView):
             'status_of_dissertation': None,
             'events': None
         }
+        flag_of_registration = False
         flag_of_work_experience = False
         flag_of_dissertation = False
 
@@ -179,8 +180,9 @@ class CalculateView(APIView):
 
                 events = []
 
-                if i == 0:
+                if flag_of_registration is False:
                     events.append('Оформление на должность ППС')
+                    flag_of_registration = True
 
                 if user.work_experience == 36 and flag_of_work_experience is False:
                     events.append('3 года работы преподавателем')
