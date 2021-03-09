@@ -179,6 +179,9 @@ class CalculateView(APIView):
 
                 events = []
 
+                if i == 0:
+                    events.append('Оформление на должность ППС')
+
                 if user.work_experience == 36 and flag_of_work_experience is False:
                     events.append('3 года работы преподавателем')
                     flag_of_work_experience = True
