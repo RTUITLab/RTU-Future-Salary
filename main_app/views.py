@@ -42,6 +42,28 @@ class CalculateView(APIView):
             self.date_of_dissertation = date_of_dissertation
             self.date_of_birth = date_of_birth
 
+    def get_user_position(self, user, temp_date):
+        if user.work_experience >= 36:
+            has_work_experience = True
+        else:
+            has_work_experience = False
+
+        if temp_date > user.date_of_dissertation:
+            has_k_n = True
+        else:
+            has_k_n = False
+
+        if has_k_n is False and has_work_experience is False:
+            return 'Assistant'
+        elif has_k_n is False and has_work_experience is True:
+            return 'Teacher'
+        elif has_k_n is True and has_work_experience is False:
+            return 'Teacher_k_n'
+        elif has_k_n is True and has_work_experience is True:
+            return 'Docent_k_n'
+        else:
+            return None
+
     def get_user_age_group(self, temp_date, date_of_birth):
         temp_age = temp_date - date_of_birth
         temp_age_days = temp_age.days - 30  # округление в меньшую
@@ -130,6 +152,7 @@ class CalculateView(APIView):
         '''
 
         data = list()
+        prev_events = []
         month_data = {
             'academic_status': None,
             'academic_course': None,
@@ -140,29 +163,21 @@ class CalculateView(APIView):
             'status_of_dissertation': None,
             'events': None
         }
+
         flag_of_registration = False
         flag_of_work_experience = False
         flag_of_dissertation = False
 
-        # before_time = user.date_of_registration - datetime.now()  # user.date_of_registration must be > datetime.now()
-        # before_time = int(before_time.days / 30 + 1)
-        # user_age = datetime.now() - user.date_of_birth
-        # plus_time = 33 * 12 - int(user_age.days/31) - 24
+        flag_of_position_assistant = False
+        flag_of_position_teacher = False
+        flag_of_position_teacher_k_n = False
+        flag_of_position_docent_k_n = False
 
         user_dissertation_age = user.date_of_dissertation - user.date_of_birth
         plus_time = int(33 - user_dissertation_age.days / 365 + 1)
 
-        # print(int(33 - user_dissertation_age.days / 365 + 1))
-
         all_time = user.date_of_dissertation - datetime.now()  # user.date_of_dissertation must be > datetime.now()
         all_time = int(all_time.days / 30 + 1 + 12 + plus_time * 12)
-
-        # print(all_time/12)
-
-        # print(plus_time/12)
-        # print(user.date_of_birth.year + all_time/12)
-
-        # min_added_time = user.date_of_birth
 
         current_year = datetime.now().year
         current_month = datetime.now().month
@@ -171,14 +186,18 @@ class CalculateView(APIView):
         for i in range(all_time):
             temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
 
-            # if temp_date < user.date_of_registration:
-            #     print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
-            # else:
-            #     print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
+            if temp_date < user.date_of_registration:
+                print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
+            else:
+                print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
 
             if temp_date > user.date_of_registration:
 
                 events = []
+                events += prev_events
+                prev_events = []
+
+                # print(self.get_user_position(user, temp_date))
 
                 if flag_of_registration is False:
                     events.append('Оформление на должность ППС')
@@ -199,6 +218,19 @@ class CalculateView(APIView):
                         and month_data['status_of_age_group'] is not None:
                     events.append('Переход в следующую возрастную группу')
 
+                if flag_of_position_assistant is False and self.get_user_position(user, temp_date) == 'Assistant':
+                    events.append('Должность Ассистента')
+                    flag_of_position_assistant = True
+                if flag_of_position_teacher is False and self.get_user_position(user, temp_date) == 'Teacher':
+                    events.append('Должность Старшего Преподавателя')
+                    flag_of_position_teacher = True
+                if flag_of_position_teacher_k_n is False and self.get_user_position(user, temp_date) == 'Teacher_k_n':
+                    events.append('Должность Старшего Преподавателя с уч. степенью к.н.')
+                    flag_of_position_teacher_k_n = True
+                if flag_of_position_docent_k_n is False and self.get_user_position(user, temp_date) == 'Docent_k_n':
+                    events.append('Должность Старшего Преподавателя с уч. степенью к.н.')
+                    flag_of_position_docent_k_n = True
+
                 month_data = {
                     'academic_status': user.academic_status,
                     'academic_course': user.academic_course,
@@ -216,8 +248,9 @@ class CalculateView(APIView):
                     'events': month_data['events']
                 })
 
-                # print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
-                #       month_data['status_of_dissertation'], month_data['salary'], month_data['events'])
+                print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
+                      month_data['status_of_dissertation'], month_data['salary'],
+                      self.get_user_position(user, temp_date), month_data['events'])
                 if (current_month == 7 or current_month == 8) and user.academic_status == 'Master':
                     pass
                 else:
