@@ -6,9 +6,9 @@ import os
 from django.views.generic.base import View
 from django.http import HttpResponse
 
-# MONTHS = [
-#     'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июль', '', '', '', '', '',
-# ]
+MONTHS = [
+    'None', 'Янв', 'Фев', 'Мар', 'Апр', 'Май', 'Июнь', 'Июль', 'Авг', 'Сен', 'Окт', 'Ноя', 'Дек',
+]
 
 ASSISTANT_SALARIES = [
     96785, 89340, 74450, 74450, 74450,
@@ -122,7 +122,7 @@ class CalculateView(APIView):
             date_of_birth=datetime.strptime(request.data['date_of_birth'], '%Y-%m-%d')
         )
 
-        print(user.academic_status)
+        # print(user.academic_status)
 
         '''
         1) вычислим статус на момент регистрации
@@ -154,12 +154,18 @@ class CalculateView(APIView):
                 month_data = {
                     'academic_status': user.academic_status,
                     'academic_course': user.academic_course,
-                    'date': f'{current_year} {current_month}',
+                    'date': f' {MONTHS[current_month]} {current_year}',
                     'salary': self.calculate_month_salary(user, temp_date),
                     'status_of_work_experience': user.work_experience >= 36,
                     'status_of_age_group': self.get_user_age_group(temp_date, user.date_of_birth),
                     'status_of_dissertation': temp_date > user.date_of_dissertation
                 }
+
+                data.append({
+                    'date': month_data['date'],
+                    'salary': month_data['salary'],
+                })
+
                 print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
                       month_data['status_of_dissertation'], month_data['salary'])
                 if (current_month == 7 or current_month == 8) and user.academic_status == 'Master':
