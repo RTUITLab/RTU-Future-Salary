@@ -128,8 +128,10 @@ class CalculateView(APIView):
         1) вычислим статус на момент регистрации
         2) вычислим карьеру с момента регистрации
         '''
+
         data = list()
         flag_of_work_experience = False
+        flag_of_dissertation = False
 
         before_time = user.date_of_registration - datetime.now()  # user.date_of_registration must be > datetime.now()
         before_time = int(before_time.days / 30 + 1)
@@ -155,9 +157,13 @@ class CalculateView(APIView):
 
                 events = []
 
-                if user.work_experience == 36 and flag_of_work_experience == False:
-                    events.append('3 года работы')
+                if user.work_experience == 36 and flag_of_work_experience is False:
+                    events.append('3 года работы преподавателем')
                     flag_of_work_experience = True
+
+                if temp_date > user.date_of_dissertation and flag_of_dissertation is False:
+                    events.append('Диссертация защищена')
+                    flag_of_dissertation = True
 
                 month_data = {
                     'academic_status': user.academic_status,
