@@ -145,14 +145,21 @@ class CalculateView(APIView):
 
         # before_time = user.date_of_registration - datetime.now()  # user.date_of_registration must be > datetime.now()
         # before_time = int(before_time.days / 30 + 1)
-        user_age = datetime.now() - user.date_of_birth
-        plus_time = 33 * 12 - int(user_age.days/31) - 24
+        # user_age = datetime.now() - user.date_of_birth
+        # plus_time = 33 * 12 - int(user_age.days/31) - 24
+
+        user_dissertation_age = user.date_of_dissertation - user.date_of_birth
+        plus_time = int(33 - user_dissertation_age.days / 365 + 1)
+
+        # print(int(33 - user_dissertation_age.days / 365 + 1))
 
         all_time = user.date_of_dissertation - datetime.now()  # user.date_of_dissertation must be > datetime.now()
-        all_time = int(all_time.days / 30 + 1 + 24 + plus_time)
+        all_time = int(all_time.days / 30 + 1 + 12 + plus_time * 12)
 
-        print(plus_time/12)
-        print(all_time/12)
+        # print(all_time/12)
+
+        # print(plus_time/12)
+        # print(user.date_of_birth.year + all_time/12)
 
         # min_added_time = user.date_of_birth
 
