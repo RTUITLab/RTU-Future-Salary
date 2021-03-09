@@ -114,11 +114,11 @@ class CalculateView(APIView):
     def post(self, request):
 
         user = self.User(
-            academic_status=request.data['academic_degree'],
-            academic_course=int(request.data['academic_degree_course']),
+            academic_status=request.data['academic_status'],
+            academic_course=int(request.data['academic_course']),
             date_of_registration=datetime.strptime(request.data['date_of_registration'], '%Y-%m-%d'),
             work_experience=int(request.data['work_experience']),
-            date_of_dissertation=datetime.strptime(request.data['date_of_dissertation_defense'], '%Y-%m-%d'),
+            date_of_dissertation=datetime.strptime(request.data['date_of_dissertation'], '%Y-%m-%d'),
             date_of_birth=datetime.strptime(request.data['date_of_birth'], '%Y-%m-%d')
         )
 
