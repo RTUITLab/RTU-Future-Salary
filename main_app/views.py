@@ -143,11 +143,16 @@ class CalculateView(APIView):
         flag_of_work_experience = False
         flag_of_dissertation = False
 
-        before_time = user.date_of_registration - datetime.now()  # user.date_of_registration must be > datetime.now()
-        before_time = int(before_time.days / 30 + 1)
+        # before_time = user.date_of_registration - datetime.now()  # user.date_of_registration must be > datetime.now()
+        # before_time = int(before_time.days / 30 + 1)
+        user_age = datetime.now() - user.date_of_birth
+        plus_time = 33 * 12 - int(user_age.days/31) - 24
 
         all_time = user.date_of_dissertation - datetime.now()  # user.date_of_dissertation must be > datetime.now()
-        all_time = int(all_time.days / 30 + 1 + 24)
+        all_time = int(all_time.days / 30 + 1 + 24 + plus_time)
+
+        print(plus_time/12)
+        print(all_time/12)
 
         # min_added_time = user.date_of_birth
 
@@ -158,10 +163,10 @@ class CalculateView(APIView):
         for i in range(all_time):
             temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
 
-            if temp_date < user.date_of_registration:
-                print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
-            else:
-                print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
+            # if temp_date < user.date_of_registration:
+            #     print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
+            # else:
+            #     print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
 
             if temp_date > user.date_of_registration:
 
@@ -199,8 +204,8 @@ class CalculateView(APIView):
                     'events': month_data['events']
                 })
 
-                print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
-                      month_data['status_of_dissertation'], month_data['salary'], month_data['events'])
+                # print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
+                #       month_data['status_of_dissertation'], month_data['salary'], month_data['events'])
                 if (current_month == 7 or current_month == 8) and user.academic_status == 'Master':
                     pass
                 else:
