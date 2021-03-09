@@ -130,6 +130,16 @@ class CalculateView(APIView):
         '''
 
         data = list()
+        month_data = {
+            'academic_status': None,
+            'academic_course': None,
+            'date': None,
+            'salary': None,
+            'status_of_work_experience': None,
+            'status_of_age_group': None,
+            'status_of_dissertation': None,
+            'events': None
+        }
         flag_of_work_experience = False
         flag_of_dissertation = False
 
@@ -162,8 +172,11 @@ class CalculateView(APIView):
                     flag_of_work_experience = True
 
                 if temp_date > user.date_of_dissertation and flag_of_dissertation is False:
-                    events.append('Диссертация защищена')
+                    events.append('Защищена диссертация')
                     flag_of_dissertation = True
+
+                if month_data['academic_status'] != user.academic_status and user.academic_status == 'PreCandidate':
+                    events.append('Поступление в аспирантуру')
 
                 month_data = {
                     'academic_status': user.academic_status,
@@ -187,7 +200,8 @@ class CalculateView(APIView):
                 if (current_month == 7 or current_month == 8) and user.academic_status == 'Master':
                     pass
                 else:
-                    user.work_experience += 1
+                    if user.academic_status != 'Specialist':
+                        user.work_experience += 1
 
             if current_month == 8:
 
