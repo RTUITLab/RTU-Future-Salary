@@ -129,6 +129,7 @@ class CalculateView(APIView):
         2) вычислим карьеру с момента регистрации
         '''
         data = list()
+        flag_of_work_experience = False
 
         before_time = user.date_of_registration - datetime.now()  # user.date_of_registration must be > datetime.now()
         before_time = int(before_time.days / 30 + 1)
@@ -151,6 +152,13 @@ class CalculateView(APIView):
                 print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
 
             if temp_date > user.date_of_registration:
+
+                events = []
+
+                if user.work_experience == 36 and flag_of_work_experience == False:
+                    events.append('3 года работы')
+                    flag_of_work_experience = True
+
                 month_data = {
                     'academic_status': user.academic_status,
                     'academic_course': user.academic_course,
@@ -158,16 +166,18 @@ class CalculateView(APIView):
                     'salary': self.calculate_month_salary(user, temp_date),
                     'status_of_work_experience': user.work_experience >= 36,
                     'status_of_age_group': self.get_user_age_group(temp_date, user.date_of_birth),
-                    'status_of_dissertation': temp_date > user.date_of_dissertation
+                    'status_of_dissertation': temp_date > user.date_of_dissertation,
+                    'events': events
                 }
 
                 data.append({
                     'date': month_data['date'],
                     'salary': month_data['salary'],
+                    'events': month_data['events']
                 })
 
                 print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
-                      month_data['status_of_dissertation'], month_data['salary'])
+                      month_data['status_of_dissertation'], month_data['salary'], month_data['events'])
                 if (current_month == 7 or current_month == 8) and user.academic_status == 'Master':
                     pass
                 else:
