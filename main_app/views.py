@@ -178,6 +178,10 @@ class CalculateView(APIView):
                 if month_data['academic_status'] != user.academic_status and user.academic_status == 'PreCandidate':
                     events.append('Поступление в аспирантуру')
 
+                if month_data['status_of_age_group'] != self.get_user_age_group(temp_date, user.date_of_birth) \
+                        and month_data['status_of_age_group'] is not None:
+                    events.append('Переход в следующую возрастную группу')
+
                 month_data = {
                     'academic_status': user.academic_status,
                     'academic_course': user.academic_course,
