@@ -301,24 +301,38 @@ class CalculateView(APIView):
 
         print('------------------------')
 
-        for i in range(len(data)):
-            if i < 10:
+        # qwe = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+        # qwe.reverse()
 
-                if data[i]['vacation_status'] is True:
-                    temp_data = data[0:i]
-                    for j in range(len(temp_data)):
-                        if temp_data[j]['vacation_status'] is True:
-                            temp_data.pop(j)
+        # print(qwe[0:10])
 
-                    temp_sum = 0
-                    for el in temp_data:
-                        temp_sum += el['salary']
-                    temp_salary = int(temp_sum / len(temp_data))
-                    print(temp_salary)
-                    data[i]['vacation_salary'] = temp_salary
+        print(len(data))
 
-            else:
-                pass
+        for i in range(len(data) - 1):
+            if data[i]['vacation_status'] is True:
+                print(i, end='\t')
+                temp_data = data[0:i]
+
+                pop_list = []
+                for j in range(len(temp_data) - 1):
+                    print(-j - 1, end=' ')
+                    if temp_data[-j - 1]['vacation_status'] is True:
+                        pop_list.append(-j - 1)
+
+                for pop_el in pop_list:
+                    temp_data.pop(pop_el)
+
+                print('\n')
+                if len(temp_data) > 10:
+                    temp_data.reverse()
+                    temp_data = temp_data[0:10]
+
+                temp_sum = 0
+                for el in temp_data:
+                    temp_sum += el['salary']
+                temp_salary = int(temp_sum / len(temp_data))
+                # print(temp_salary)
+                data[i]['vacation_salary'] = temp_salary
 
         # flag_of_first_vacation = False
         # for i in range(len(data)):
