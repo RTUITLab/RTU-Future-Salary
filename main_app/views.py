@@ -161,7 +161,8 @@ class CalculateView(APIView):
             'status_of_work_experience': None,
             'status_of_age_group': None,
             'status_of_dissertation': None,
-            'events': None
+            'events': None,
+            'vacation_salary': None
         }
 
         flag_of_registration = False
@@ -186,10 +187,10 @@ class CalculateView(APIView):
         for i in range(all_time):
             temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
 
-            if temp_date < user.date_of_registration:
-                print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
-            else:
-                print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
+            # if temp_date < user.date_of_registration:
+            #     print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
+            # else:
+            #     print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
 
             if temp_date > user.date_of_registration:
 
@@ -239,18 +240,23 @@ class CalculateView(APIView):
                     'status_of_work_experience': user.work_experience >= 36,
                     'status_of_age_group': self.get_user_age_group(temp_date, user.date_of_birth),
                     'status_of_dissertation': temp_date > user.date_of_dissertation,
-                    'events': events
+                    'vacation_status': (
+                                               temp_date.month == 7 or temp_date.month == 8) and user.academic_status == 'Master',
+                    'events': events,
+                    'vacation_salary': None
                 }
 
                 data.append({
                     'date': month_data['date'],
                     'salary': month_data['salary'],
-                    'events': month_data['events']
+                    'events': month_data['events'],
+                    'vacation_status': month_data['vacation_status'],
+                    'vacation_salary': month_data['vacation_salary'],
                 })
 
-                print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
-                      month_data['status_of_dissertation'], month_data['salary'],
-                      self.get_user_position(user, temp_date), month_data['events'])
+                # print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
+                #       month_data['status_of_dissertation'], month_data['vacation_status'], month_data['salary'],
+                #       self.get_user_position(user, temp_date), month_data['events'])
                 if (current_month == 7 or current_month == 8) and user.academic_status == 'Master':
                     pass
                 else:
@@ -293,4 +299,37 @@ class CalculateView(APIView):
         # for i in range(all_time):
         #     pass
 
+        print('------------------------')
+
+        for i in range(len(data)):
+            if i < 10:
+
+                if data[i]['vacation_status'] is True:
+                    temp_data = data[0:i]
+                    for j in range(len(temp_data)):
+                        if temp_data[j]['vacation_status'] is True:
+                            temp_data.pop(j)
+
+                    temp_sum = 0
+                    for el in temp_data:
+                        temp_sum += el['salary']
+                    temp_salary = int(temp_sum / len(temp_data))
+                    print(temp_salary)
+                    data[i]['vacation_salary'] = temp_salary
+
+            else:
+                pass
+
+        # flag_of_first_vacation = False
+        # for i in range(len(data)):
+        #     if data[i]['salary'] == 0:
+        #         temp_data = data[0:i - 1]
+        #         for el in temp_data:
+        #             if el['salary'] == 0:
+        #                 temp_data.remove(el)
+        #         temp_sum = 0
+        #         for el in temp_data:
+        #             temp_sum += el['salary']
+        #         temp_salary = int(temp_sum / len(temp_data))
+        #         print(temp_salary)
         return Response(data)
