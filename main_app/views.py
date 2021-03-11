@@ -178,7 +178,10 @@ class CalculateView(APIView):
         plus_time = int(33 - user_dissertation_age.days / 365 + 1)
 
         all_time = user.date_of_dissertation - datetime.now()  # user.date_of_dissertation must be > datetime.now()
-        all_time = int(all_time.days / 30 + 1 + 12 + plus_time * 12)
+        if plus_time > 0:
+            all_time = int(all_time.days / 30 + 1 + 12 + plus_time * 12)
+        else:
+            all_time = int(all_time.days / 30 + 1 + 12)
 
         current_year = datetime.now().year
         current_month = datetime.now().month
