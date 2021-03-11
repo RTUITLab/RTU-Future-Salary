@@ -1,0 +1,23 @@
+version: '3.7'
+
+services:
+  django:
+    build: ./salary
+    command: sh -c "pip install -r requirements.txt && python3 manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8080 project.wsgi"
+    volumes:
+      - static:/usr/src/salary/static
+      - /home/salary:/usr/src/salary
+    expose:
+      - 8080
+  nginx:
+    build: ./nginx
+    command: nginx -g "daemon off;"
+    volumes:
+      - static:/usr/src/salary/static
+      - /home/salary:/usr/src/salary
+    ports:
+      - 8000:80
+    depends_on:
+      - django
+volumes:
+  static:
