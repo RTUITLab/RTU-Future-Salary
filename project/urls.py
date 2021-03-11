@@ -15,9 +15,10 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path
-# import main_app.views_1 as views_1
 import main_app.views as views
 from django.conf.urls import url
+from django.conf.urls.static import static
+from django.conf import settings
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -27,4 +28,6 @@ urlpatterns = [
     # path('api/calculate_dev', views.CalculateView.as_view()),
 ]
 
-# urlpatterns += [url(r'^', views_1.ReactAppView.as_view())]
+urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+urlpatterns += static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
+urlpatterns += [url(r'^', views.ReactAppView.as_view())]

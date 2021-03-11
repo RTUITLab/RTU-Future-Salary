@@ -347,3 +347,21 @@ class CalculateView(APIView):
         #         temp_salary = int(temp_sum / len(temp_data))
         #         print(temp_salary)
         return Response(data)
+
+
+class ReactAppView(View):
+
+    def get(self, request):
+        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+        try:
+            with open(os.path.join(BASE_DIR, 'frontend', 'build', 'index.html')) as file:
+                return HttpResponse(file.read())
+
+        except:
+            return HttpResponse(
+                """
+                File index.html not found ! Build your React app !
+                """,
+                status=501,
+            )
