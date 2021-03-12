@@ -269,8 +269,8 @@ class CalculateView(APIView):
             if current_month == 8:
 
                 if user.academic_status == 'Master':
-                    if user.academic_course == 1:
-                        user.academic_course = 2
+                    if user.academic_course != 2:
+                        user.academic_course += 1
                     elif user.academic_course == 2:
                         user.academic_status = 'PreCandidate'
                         user.academic_course = 0
