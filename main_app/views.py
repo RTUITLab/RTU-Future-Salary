@@ -250,8 +250,8 @@ class CalculateView(APIView):
                 }
 
                 data.append({
-                    'academic_status': user.academic_status,
-                    'academic_course': user.academic_course,
+                    'academic_status': month_data['academic_status'],
+                    'academic_course': month_data['academic_course'],
                     'date': month_data['date'],
                     'salary': month_data['salary'],
                     'events': month_data['events'],
@@ -259,9 +259,9 @@ class CalculateView(APIView):
                     'vacation_salary': month_data['vacation_salary'],
                 })
 
-                # print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
-                #       month_data['status_of_dissertation'], month_data['vacation_status'], month_data['salary'],
-                #       self.get_user_position(user, temp_date), month_data['events'])
+                print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
+                      month_data['status_of_dissertation'], month_data['vacation_status'], month_data['salary'],
+                      self.get_user_position(user, temp_date), month_data['events'])
                 if (current_month == 7 or current_month == 8) and user.academic_status == 'Master':
                     pass
                 else:
@@ -313,21 +313,29 @@ class CalculateView(APIView):
 
         print(len(data))
 
+        temp_delay = 0
+        temp_events = data[0]['events']
+
         for i in range(len(data) - 1):
+
+            if data[i]['academic_course'] == 0:
+                temp_delay += 1
+
             if data[i]['vacation_status'] is True and data[i]['academic_course'] != 0:
-                print(i, end='\t')
-                temp_data = data[0:i]
+                print('academic_course != 0')
+                # print(i, end='\t')
+                temp_data = data[0 + temp_delay:i]
 
                 pop_list = []
                 for j in range(len(temp_data) - 1):
-                    print(-j - 1, end=' ')
+                    # print(-j - 1, end=' ')
                     if temp_data[-j - 1]['vacation_status'] is True:
                         pop_list.append(-j - 1)
 
                 for pop_el in pop_list:
                     temp_data.pop(pop_el)
 
-                print('\n')
+                # print('\n')
                 if len(temp_data) > 10:
                     temp_data.reverse()
                     temp_data = temp_data[0:10]
@@ -338,6 +346,10 @@ class CalculateView(APIView):
                 temp_salary = int(temp_sum / len(temp_data))
                 # print(temp_salary)
                 data[i]['vacation_salary'] = temp_salary
+
+        data = data[temp_delay:len(data)]
+
+        data[0]['events'] = temp_events
 
         # flag_of_first_vacation = False
         # for i in range(len(data)):
