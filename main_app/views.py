@@ -314,7 +314,7 @@ class CalculateView(APIView):
         print(len(data))
 
         for i in range(len(data) - 1):
-            if data[i]['vacation_status'] is True and data[i]['academic_course']:
+            if data[i]['vacation_status'] is True and data[i]['academic_course'] != 0:
                 print(i, end='\t')
                 temp_data = data[0:i]
 
