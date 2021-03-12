@@ -250,6 +250,8 @@ class CalculateView(APIView):
                 }
 
                 data.append({
+                    'academic_status': user.academic_status,
+                    'academic_course': user.academic_course,
                     'date': month_data['date'],
                     'salary': month_data['salary'],
                     'events': month_data['events'],
@@ -312,7 +314,7 @@ class CalculateView(APIView):
         print(len(data))
 
         for i in range(len(data) - 1):
-            if data[i]['vacation_status'] is True:
+            if data[i]['vacation_status'] is True and data[i]['academic_course']:
                 print(i, end='\t')
                 temp_data = data[0:i]
 
