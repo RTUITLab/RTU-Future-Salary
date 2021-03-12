@@ -226,7 +226,7 @@ class CalculateView(APIView):
                     events.append('Должность Ассистента')
                     flag_of_position_assistant = True
                 if flag_of_position_teacher is False and self.get_user_position(user, temp_date) == 'Teacher':
-                    events.append('Должность Старшего Преподавателя')
+                    events.append('Должность Старшего преподавателя')
                     flag_of_position_teacher = True
                 if flag_of_position_teacher_k_n is False and self.get_user_position(user, temp_date) == 'Teacher_k_n':
                     events.append('Должность Старшего Преподавателя с уч. степенью к.н.')
