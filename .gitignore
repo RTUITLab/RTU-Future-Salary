@@ -3,7 +3,6 @@
 .env
 venv
 META
-frontend
 frontend/Dockerfile
 desktop.ini
 db.sqlite3
