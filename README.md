@@ -1,7 +1,6 @@
 # SALARY-PROJECT
 Core backend service for open-source "Salary" project for RTUITLab
 
-> Frontend source code: https://github.com/Zayac11/Salary
 
 ## Launching project
 #### Git, Docker and Docker Compose must be installed
