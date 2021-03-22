@@ -1,8 +1,6 @@
 # SALARY-PROJECT
 Core backend service for open-source "Salary" project for RTUITLab
 
-![Main page](https://github.com/AlexGeniusMan/SALARY-PROJECT/blob/master/readme-images/main.png?raw=true)
-
 ## Launching project
 #### Git, Docker and Docker Compose must be installed
 
@@ -38,5 +36,7 @@ Note: if you want to launch project locally, set your_production_url to "http://
 `docker-compose up --build`
 
 > Done! Project launched on 8000 port!
+
+![Main page](https://github.com/AlexGeniusMan/SALARY-PROJECT/blob/master/readme-images/main.png?raw=true)
 
 This project was made by Dev.gang.
