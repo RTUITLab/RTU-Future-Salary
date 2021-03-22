@@ -35,6 +35,6 @@ REACT_APP_PRODUCTION_URL = "<your_production_url>"
 
 `docker-compose up --build`
 
-> Done! Project launched!
+> Done! Project launched on 8000 port!
 
 This project was made by Dev.gang.
