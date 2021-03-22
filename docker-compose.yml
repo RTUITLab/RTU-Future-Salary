@@ -1,0 +1,31 @@
+version: '3.7'
+
+services:
+  salary_backend:
+    build:
+      context: ./backend
+    command: sh -c "pip install -r requirements.txt && python3 manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8080 project.wsgi"
+    expose:
+      - 8080
+#    ports:
+#      - 80:8080
+  salary_frontend:
+    build:
+      context: ./frontend
+    command: npm run-script build
+    volumes:
+      - salary_build_folder:/frontend/build
+  salary_nginx:
+#    image: nginx:latest
+    build:
+      context: ./nginx
+    ports:
+      - 80:8080
+    volumes:
+#      - ./nginx/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+      - salary_build_folder:/var/www/frontend
+    depends_on:
+      - salary_backend
+      - salary_frontend
+volumes:
+  salary_build_folder:
