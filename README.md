@@ -29,9 +29,9 @@ SECRET_KEY=r#l+(jiyg2m7d!f8(-zo2o2rsckwdaq4jm=_fg3$ghir5fxf6e
 REACT_APP_PRODUCTION_URL = "<your_production_url>"
 ```
 
-Note: if you want to launch project locally, set your_production_url to "http://127.0.0.1:8000/"
+Note: if you want to launch project locally, set REACT_APP_PRODUCTION_URL = "http://127.0.0.1:8000/"
 
-6. Start the project
+6. Start the project from "salary" directory
 
 `docker-compose up --build`
 
