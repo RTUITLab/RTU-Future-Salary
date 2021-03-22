@@ -1,6 +1,7 @@
 # SALARY-PROJECT
 Core backend service for open-source "Salary" project for RTUITLab
 
+![Main page](https://github.com/AlexGeniusMan/SALARY-PROJECT/blob/master/readme-images/main.png?raw=true)
 
 ## Launching project
 #### Git, Docker and Docker Compose must be installed
