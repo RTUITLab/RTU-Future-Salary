@@ -4,15 +4,14 @@ Core backend service for open-source "Salary" project for RTUITLab
 
 ## Launching project
 #### Git, Docker and Docker Compose must be installed
-1. Create new directory and open it
 
-`mkdir salary`
+1. Clone backend
+
+`git clone https://github.com/AlexGeniusMan/SALARY-PROJECT salary`
+
+2. Open project directory
 
 `cd salary`
-
-2. Clone backend
-
-`git clone https://github.com/AlexGeniusMan/SALARY-PROJECT .`
 
 3. Clone frontend
 
