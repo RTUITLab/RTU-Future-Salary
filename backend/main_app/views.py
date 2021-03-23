@@ -90,8 +90,10 @@ class CalculateView(APIView):
             rate = 1
         elif user.academic_status == 'Bachelor':
             rate = 0
-        elif user.academic_status == 'Master':
+        elif user.academic_status == 'Master' and user.academic_course != 6:
             rate = 0.5
+        elif user.academic_status == 'Master' and user.academic_course == 6:
+            rate = 1
         elif user.academic_status == 'PreCandidate':
             rate = 1
         elif user.academic_status == 'Graduate':
@@ -134,7 +136,10 @@ class CalculateView(APIView):
             salary = None
 
         if (temp_date.month == 7 or temp_date.month == 8) and user.academic_status == 'Master':
-            return 0
+            if user.academic_course != 6:
+                return 0
+            else:
+                return int(salary)
         else:
             return int(salary)
 
@@ -152,10 +157,11 @@ class CalculateView(APIView):
 
             if user.academic_status == 'Bachelor' and user.academic_course == 6:
                 user.academic_status = 'Master'
-                user.academic_course = 1
+                user.academic_course = 0
             elif user.academic_status == 'Master' and user.academic_course == 6:
-                user.academic_status = 'PreCandidate'
-                user.academic_course = 1
+                # user.academic_status = 'Master'
+                # user.academic_course = 2
+                pass
             elif user.academic_status == 'Specialist' and user.academic_course == 6:
                 # user.academic_status = 'Specialist'
                 # user.academic_course = 5
@@ -298,9 +304,12 @@ class CalculateView(APIView):
                             user.academic_course = 0
 
                     if user.academic_status == 'Master':
-                        if user.academic_course != 2:
+                        if user.academic_course != 2 and user.academic_course != 6:
                             user.academic_course += 1
                         elif user.academic_course == 2:
+                            user.academic_status = 'PreCandidate'
+                            user.academic_course = 0
+                        elif user.academic_course == 6:
                             user.academic_status = 'PreCandidate'
                             user.academic_course = 0
 
@@ -396,21 +405,3 @@ class CalculateView(APIView):
             return Response(data)
         except:
             return Response({"error_message": "BAD REQUEST", "status": status.HTTP_400_BAD_REQUEST})
-
-
-class ReactAppView(View):
-
-    def get(self, request):
-        BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-        try:
-            with open(os.path.join(BASE_DIR, 'frontend', 'build', 'index.html')) as file:
-                return HttpResponse(file.read())
-
-        except:
-            return HttpResponse(
-                """
-                File index.html not found ! Build your React app !
-                """,
-                status=501,
-            )
