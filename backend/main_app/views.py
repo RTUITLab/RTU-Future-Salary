@@ -155,6 +155,15 @@ class CalculateView(APIView):
                 date_of_birth=datetime.strptime(request.data['date_of_birth'], '%Y-%m-%d')
             )
 
+            flag_of_registration = False
+            flag_of_work_experience = False
+            flag_of_dissertation = False
+
+            flag_of_position_assistant = False
+            flag_of_position_teacher = False
+            flag_of_position_teacher_k_n = False
+            flag_of_position_docent_k_n = False
+
             if user.academic_status == 'Bachelor' and user.academic_course == 6:
                 user.academic_status = 'Master'
                 user.academic_course = 0
@@ -190,15 +199,6 @@ class CalculateView(APIView):
                 'vacation_salary': None
             }
 
-            flag_of_registration = False
-            flag_of_work_experience = False
-            flag_of_dissertation = False
-
-            flag_of_position_assistant = False
-            flag_of_position_teacher = False
-            flag_of_position_teacher_k_n = False
-            flag_of_position_docent_k_n = False
-
             user_dissertation_age = user.date_of_dissertation - user.date_of_birth
             plus_time = int(33 - user_dissertation_age.days / 365 + 1)
 
@@ -218,7 +218,8 @@ class CalculateView(APIView):
                 if temp_date < user.date_of_registration:
                     print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
                 else:
-                    print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
+                    print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}',
+                          end='\t')
 
                 if temp_date > user.date_of_registration:
 
@@ -227,7 +228,8 @@ class CalculateView(APIView):
                     prev_events = []
 
                     # print(self.get_user_position(user, temp_date))
-                    if user.academic_status != 'Bachelor' and user.academic_status != 'Specialist':
+                    if user.academic_status != 'Bachelor' and user.academic_status != 'Specialist' \
+                            or user.academic_status == 'Specialist' and user.academic_course == 6:
                         if flag_of_registration is False:
                             events.append('Оформление на должность ППС')
                             flag_of_registration = True
@@ -240,27 +242,35 @@ class CalculateView(APIView):
                             events.append('Защищена диссертация')
                             flag_of_dissertation = True
 
-                        if month_data['academic_status'] != user.academic_status and user.academic_status == 'PreCandidate':
+                        if month_data[
+                            'academic_status'] != user.academic_status and user.academic_status == 'PreCandidate' and user.academic_course is not None:
                             events.append('Поступление в аспирантуру')
 
-                        if month_data['status_of_age_group'] != self.get_user_age_group(temp_date, user.date_of_birth) \
+                        if month_data['status_of_age_group'] != self.get_user_age_group(temp_date,
+                                                                                        user.date_of_birth) \
                                 and month_data['status_of_age_group'] is not None:
                             events.append('Переход в следующую возрастную группу')
 
-                        if flag_of_position_assistant is False and self.get_user_position(user, temp_date) == 'Assistant':
+                        if flag_of_position_assistant is False and self.get_user_position(user,
+                                                                                          temp_date) == 'Assistant':
                             events.append('Должность Ассистента')
                             flag_of_position_assistant = True
-                        if flag_of_position_teacher is False and self.get_user_position(user, temp_date) == 'Teacher':
+                        if flag_of_position_teacher is False and self.get_user_position(user,
+                                                                                        temp_date) == 'Teacher':
                             events.append('Должность Старшего преподавателя')
                             flag_of_position_teacher = True
                         if flag_of_position_teacher_k_n is False and self.get_user_position(user,
                                                                                             temp_date) == 'Teacher_k_n':
                             events.append('Должность Старшего Преподавателя с уч. степенью к.н.')
                             flag_of_position_teacher_k_n = True
-                        if flag_of_position_docent_k_n is False and self.get_user_position(user, temp_date) == 'Docent_k_n':
+                        if flag_of_position_docent_k_n is False and self.get_user_position(user,
+                                                                                           temp_date) == 'Docent_k_n':
                             events.append('Должность Доцента с уч. степенью к.н.')
                             flag_of_position_docent_k_n = True
 
+                    vacation_status = (temp_date.month == 7 or temp_date.month == 8) \
+                                      and user.academic_status == 'Master' \
+                                      and user.academic_course != 6
                     month_data = {
                         'academic_status': user.academic_status,
                         'academic_course': user.academic_course,
@@ -269,8 +279,7 @@ class CalculateView(APIView):
                         'status_of_work_experience': user.work_experience >= 36,
                         'status_of_age_group': self.get_user_age_group(temp_date, user.date_of_birth),
                         'status_of_dissertation': temp_date > user.date_of_dissertation,
-                        'vacation_status': (
-                                                   temp_date.month == 7 or temp_date.month == 8) and user.academic_status == 'Master',
+                        'vacation_status': vacation_status,
                         'events': events,
                         'vacation_salary': None
                     }
