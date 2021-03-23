@@ -1,7 +1,6 @@
 # SALARY-PROJECT
 Core backend service for open-source "Salary" project for RTUITLab
 
-
 ## Launching project
 #### Git, Docker and Docker Compose must be installed
 
@@ -30,12 +29,14 @@ SECRET_KEY=r#l+(jiyg2m7d!f8(-zo2o2rsckwdaq4jm=_fg3$ghir5fxf6e
 REACT_APP_PRODUCTION_URL = "<your_production_url>"
 ```
 
-Note: if you want to launch project locally, set your_production_url to "http://127.0.0.1:8000/"
+Note: if you want to launch project locally, set REACT_APP_PRODUCTION_URL = "http://127.0.0.1:8000/"
 
-6. Start the project
+6. Start the project from "salary" directory
 
 `docker-compose up --build`
 
 > Done! Project launched on 8000 port!
+
+![Main page](https://github.com/AlexGeniusMan/SALARY-PROJECT/blob/master/readme-images/main.png?raw=true)
 
 This project was made by Dev.gang.
