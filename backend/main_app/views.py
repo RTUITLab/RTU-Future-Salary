@@ -83,7 +83,11 @@ class CalculateView(APIView):
 
     def calculate_month_salary(self, user, temp_date):
 
-        if user.academic_status == 'Specialist':
+        if user.academic_status == 'Specialist' and user.academic_course != 6:
+            rate = 0
+        elif user.academic_status == 'Specialist' and user.academic_course == 6:
+            rate = 1
+        elif user.academic_status == 'Bachelor':
             rate = 0
         elif user.academic_status == 'Master':
             rate = 0.5
@@ -144,7 +148,20 @@ class CalculateView(APIView):
             date_of_birth=datetime.strptime(request.data['date_of_birth'], '%Y-%m-%d')
         )
 
-        # print(user.academic_status)
+        if user.academic_status == 'Bachelor' and user.academic_course == 6:
+            user.academic_status = 'Master'
+            user.academic_course = 1
+        elif user.academic_status == 'Master' and user.academic_course == 6:
+            user.academic_status = 'PreCandidate'
+            user.academic_course = 1
+        elif user.academic_status == 'Specialist' and user.academic_course == 6:
+            # user.academic_status = 'Specialist'
+            # user.academic_course = 5
+            # user.academic_status = 'PreCandidate'
+            # user.academic_course = 1
+            pass
+        elif user.academic_status == 'PreCandidate' and user.academic_course == 6:
+            user.academic_course = None
 
         '''
         1) вычислим статус на момент регистрации
@@ -190,10 +207,10 @@ class CalculateView(APIView):
         for i in range(all_time):
             temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
 
-            # if temp_date < user.date_of_registration:
-            #     print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
-            # else:
-            #     print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
+            if temp_date < user.date_of_registration:
+                print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
+            else:
+                print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}', end='\t')
 
             if temp_date > user.date_of_registration:
 
@@ -202,38 +219,39 @@ class CalculateView(APIView):
                 prev_events = []
 
                 # print(self.get_user_position(user, temp_date))
+                if user.academic_status != 'Bachelor' and user.academic_status != 'Specialist':
+                    if flag_of_registration is False:
+                        events.append('Оформление на должность ППС')
+                        flag_of_registration = True
 
-                if flag_of_registration is False:
-                    events.append('Оформление на должность ППС')
-                    flag_of_registration = True
+                    if user.work_experience == 36 and flag_of_work_experience is False:
+                        events.append('3 года работы преподавателем')
+                        flag_of_work_experience = True
 
-                if user.work_experience == 36 and flag_of_work_experience is False:
-                    events.append('3 года работы преподавателем')
-                    flag_of_work_experience = True
+                    if temp_date > user.date_of_dissertation and flag_of_dissertation is False:
+                        events.append('Защищена диссертация')
+                        flag_of_dissertation = True
 
-                if temp_date > user.date_of_dissertation and flag_of_dissertation is False:
-                    events.append('Защищена диссертация')
-                    flag_of_dissertation = True
+                    if month_data['academic_status'] != user.academic_status and user.academic_status == 'PreCandidate':
+                        events.append('Поступление в аспирантуру')
 
-                if month_data['academic_status'] != user.academic_status and user.academic_status == 'PreCandidate':
-                    events.append('Поступление в аспирантуру')
+                    if month_data['status_of_age_group'] != self.get_user_age_group(temp_date, user.date_of_birth) \
+                            and month_data['status_of_age_group'] is not None:
+                        events.append('Переход в следующую возрастную группу')
 
-                if month_data['status_of_age_group'] != self.get_user_age_group(temp_date, user.date_of_birth) \
-                        and month_data['status_of_age_group'] is not None:
-                    events.append('Переход в следующую возрастную группу')
-
-                if flag_of_position_assistant is False and self.get_user_position(user, temp_date) == 'Assistant':
-                    events.append('Должность Ассистента')
-                    flag_of_position_assistant = True
-                if flag_of_position_teacher is False and self.get_user_position(user, temp_date) == 'Teacher':
-                    events.append('Должность Старшего преподавателя')
-                    flag_of_position_teacher = True
-                if flag_of_position_teacher_k_n is False and self.get_user_position(user, temp_date) == 'Teacher_k_n':
-                    events.append('Должность Старшего Преподавателя с уч. степенью к.н.')
-                    flag_of_position_teacher_k_n = True
-                if flag_of_position_docent_k_n is False and self.get_user_position(user, temp_date) == 'Docent_k_n':
-                    events.append('Должность Доцента с уч. степенью к.н.')
-                    flag_of_position_docent_k_n = True
+                    if flag_of_position_assistant is False and self.get_user_position(user, temp_date) == 'Assistant':
+                        events.append('Должность Ассистента')
+                        flag_of_position_assistant = True
+                    if flag_of_position_teacher is False and self.get_user_position(user, temp_date) == 'Teacher':
+                        events.append('Должность Старшего преподавателя')
+                        flag_of_position_teacher = True
+                    if flag_of_position_teacher_k_n is False and self.get_user_position(user,
+                                                                                        temp_date) == 'Teacher_k_n':
+                        events.append('Должность Старшего Преподавателя с уч. степенью к.н.')
+                        flag_of_position_teacher_k_n = True
+                    if flag_of_position_docent_k_n is False and self.get_user_position(user, temp_date) == 'Docent_k_n':
+                        events.append('Должность Доцента с уч. степенью к.н.')
+                        flag_of_position_docent_k_n = True
 
                 month_data = {
                     'academic_status': user.academic_status,
@@ -265,10 +283,17 @@ class CalculateView(APIView):
                 if (current_month == 7 or current_month == 8) and user.academic_status == 'Master':
                     pass
                 else:
-                    if user.academic_status != 'Specialist':
+                    if user.academic_status != 'Specialist' or user.work_experience != 'Bachelor':
                         user.work_experience += 1
 
             if current_month == 8:
+
+                if user.academic_status == 'Bachelor':
+                    if user.academic_course != 4:
+                        user.academic_course += 1
+                    elif user.academic_course == 4:
+                        user.academic_status = 'Master'
+                        user.academic_course = 0
 
                 if user.academic_status == 'Master':
                     if user.academic_course != 2:
@@ -278,14 +303,17 @@ class CalculateView(APIView):
                         user.academic_course = 0
 
                 if user.academic_status == 'Specialist':
-                    if user.academic_course != 5:
+                    if user.academic_course != 5 and user.academic_course != 6:
                         user.academic_course += 1
                     elif user.academic_course == 5:
                         user.academic_status = 'PreCandidate'
                         user.academic_course = 0
+                    elif user.academic_course == 6:
+                        user.academic_status = 'PreCandidate'
+                        user.academic_course = 0
 
                 if user.academic_status == 'PreCandidate':
-                    if user.academic_course != 4:
+                    if user.academic_course != 4 and user.academic_course is not None:
                         user.academic_course += 1
                     elif user.academic_course == 4:
                         user.academic_status = 'Graduate'
