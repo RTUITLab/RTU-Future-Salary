@@ -164,6 +164,10 @@ class CalculateView(APIView):
             flag_of_position_teacher_k_n = False
             flag_of_position_docent_k_n = False
 
+            flag_of_master = True
+            if user.academic_status == 'Bachelor' or user.academic_status == 'Master' and user.academic_course == 0:
+                flag_of_master = False
+
             if user.academic_status == 'Bachelor' and user.academic_course == 6:
                 user.academic_status = 'Master'
                 user.academic_course = 0
@@ -242,8 +246,20 @@ class CalculateView(APIView):
                             events.append('Защищена диссертация')
                             flag_of_dissertation = True
 
+                        if not flag_of_master:
+                            events.append('Поступление в магистратуру')
+                            flag_of_master = True
+
+                        # if month_data['academic_status'] != user.academic_status and \
+                        #         user.academic_status == 'Master' and \
+                        #         user.academic_course is not None:
+                        #         # user.academic_course == 1:
+                        #     events.append('Поступление в магистратуру')
+
                         if month_data[
-                            'academic_status'] != user.academic_status and user.academic_status == 'PreCandidate' and user.academic_course is not None:
+                            'academic_status'] != user.academic_status and \
+                                user.academic_status == 'PreCandidate' and \
+                                user.academic_course is not None:
                             events.append('Поступление в аспирантуру')
 
                         if month_data['status_of_age_group'] != self.get_user_age_group(temp_date,
