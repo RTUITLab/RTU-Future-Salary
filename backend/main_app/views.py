@@ -247,7 +247,8 @@ class CalculateView(APIView):
                             flag_of_work_experience = True
 
                         if temp_date > user.date_of_dissertation and flag_of_dissertation is False:
-                            events.append('Защищена диссертация')
+                            if user.academic_status == 'Graduate':
+                                events.append('Защищена диссертация')
                             flag_of_dissertation = True
 
                         if not flag_of_master:
