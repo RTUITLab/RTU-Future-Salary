@@ -168,6 +168,10 @@ class CalculateView(APIView):
             if user.academic_status == 'Bachelor' or user.academic_status == 'Master' and user.academic_course == 0:
                 flag_of_master = False
 
+            flag_of_aspirant = True
+            if not (user.academic_status == 'PreCandidate' and user.academic_course > 0):
+                flag_of_aspirant = False
+
             if user.academic_status == 'Bachelor' and user.academic_course == 6:
                 user.academic_status = 'Master'
                 user.academic_course = 0
@@ -250,17 +254,21 @@ class CalculateView(APIView):
                             events.append('Поступление в магистратуру')
                             flag_of_master = True
 
+                        if not flag_of_aspirant and user.academic_status == 'PreCandidate':
+                            events.append('Поступление в аспирантуру')
+                            flag_of_aspirant = True
+
                         # if month_data['academic_status'] != user.academic_status and \
                         #         user.academic_status == 'Master' and \
                         #         user.academic_course is not None:
                         #         # user.academic_course == 1:
                         #     events.append('Поступление в магистратуру')
 
-                        if month_data[
-                            'academic_status'] != user.academic_status and \
-                                user.academic_status == 'PreCandidate' and \
-                                user.academic_course is not None:
-                            events.append('Поступление в аспирантуру')
+                        # if month_data[
+                        #     'academic_status'] != user.academic_status and \
+                        #         user.academic_status == 'PreCandidate' and \
+                        #         user.academic_course is not None:
+                        #     events.append('Поступление в аспирантуру')
 
                         if month_data['status_of_age_group'] != self.get_user_age_group(temp_date,
                                                                                         user.date_of_birth) \
