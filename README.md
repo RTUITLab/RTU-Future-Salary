@@ -1,5 +1,5 @@
 # SALARY-PROJECT
-Core backend service for open-source "Salary" project for RTUITLab
+💸 Core backend service for open-source "Salary" project for RTUITLab
 
 ## Launching project
 #### Git, Docker and Docker Compose must be installed
