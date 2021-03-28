@@ -26,10 +26,10 @@ SECRET_KEY=r#l+(jiyg2m7d!f8(-zo2o2rsckwdaq4jm=_fg3$ghir5fxf6e
 5. Create `.env` file in the directory named `frontend` and add your production URL to it
 
 ```
-REACT_APP_PRODUCTION_URL = "http://<your_production_url>/"
+REACT_APP_PRODUCTION_URL = "http://<your_production_url>:8000/"
 ```
 
-Note: if you want to launch project locally, set REACT_APP_PRODUCTION_URL = "http://127.0.0.1/"
+Note: if you want to launch project locally, set REACT_APP_PRODUCTION_URL = "http://127.0.0.1:8000/"
 
 6. Start the project from "salary" directory
 
