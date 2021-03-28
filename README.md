@@ -29,7 +29,7 @@ SECRET_KEY=r#l+(jiyg2m7d!f8(-zo2o2rsckwdaq4jm=_fg3$ghir5fxf6e
 REACT_APP_PRODUCTION_URL = "http://<your_production_url>/"
 ```
 
-Note: if you want to launch project locally, set REACT_APP_PRODUCTION_URL = "http://127.0.0.1:8000/"
+Note: if you want to launch project locally, set REACT_APP_PRODUCTION_URL = "http://127.0.0.1/"
 
 6. Start the project from "salary" directory
 
