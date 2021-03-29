@@ -154,6 +154,12 @@ class CalculateView(APIView):
                 date_of_dissertation=datetime.strptime(request.data['date_of_dissertation'], '%Y-%m-%d'),
                 date_of_birth=datetime.strptime(request.data['date_of_birth'], '%Y-%m-%d')
             )
+            print(user.academic_status)
+            print(user.academic_course)
+            print(user.date_of_registration)
+            print(user.work_experience)
+            print(user.date_of_dissertation)
+            print(user.date_of_birth)
 
             flag_of_registration = False
             flag_of_work_experience = False
@@ -218,7 +224,8 @@ class CalculateView(APIView):
 
             current_year = datetime.now().year
             current_month = datetime.now().month
-            current_day = datetime.now().day
+            # current_day = datetime.now().day
+            current_day = 15
 
             for i in range(all_time):
                 temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
@@ -438,4 +445,5 @@ class CalculateView(APIView):
             #         print(temp_salary)
             return Response(data)
         except:
+            raise
             return Response({"error_message": "BAD REQUEST", "status": status.HTTP_400_BAD_REQUEST})
