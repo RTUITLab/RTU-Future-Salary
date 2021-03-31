@@ -171,16 +171,6 @@ class CalculateView(APIView):
             if user.academic_status == 'Bachelor' and user.academic_course == 6:
                 user.academic_status = 'Master'
                 user.academic_course = 0
-            # elif user.academic_status == 'Master' and user.academic_course == 6:
-            #     # user.academic_status = 'Master'
-            #     # user.academic_course = 2
-            #     pass
-            # elif user.academic_status == 'Specialist' and user.academic_course == 6:
-            #     # user.academic_status = 'Specialist'
-            #     # user.academic_course = 5
-            #     # user.academic_status = 'PreCandidate'
-            #     # user.academic_course = 1
-            #     pass
             elif user.academic_status == 'PreCandidate' and user.academic_course == 6:
                 user.academic_course = None
 
@@ -253,18 +243,6 @@ class CalculateView(APIView):
                         if not flag_of_aspirant and user.academic_status == 'PreCandidate':
                             events.append('Поступление в аспирантуру')
                             flag_of_aspirant = True
-
-                        # if month_data['academic_status'] != user.academic_status and \
-                        #         user.academic_status == 'Master' and \
-                        #         user.academic_course is not None:
-                        #         # user.academic_course == 1:
-                        #     events.append('Поступление в магистратуру')
-
-                        # if month_data[
-                        #     'academic_status'] != user.academic_status and \
-                        #         user.academic_status == 'PreCandidate' and \
-                        #         user.academic_course is not None:
-                        #     events.append('Поступление в аспирантуру')
 
                         if month_data['status_of_age_group'] != self.get_user_age_group(temp_date,
                                                                                         user.date_of_birth) \
@@ -365,21 +343,7 @@ class CalculateView(APIView):
                 else:
                     current_month += 1
 
-            # all_time = user['date_of_dissertation_defense'] - datetime.now()
-            # all_time = int(all_time.days / 30 + 1)
-            # print(all_time)
-            #
-            # for i in range(all_time):
-            #     pass
-
             # print('------------------------')
-
-            # qwe = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-            # qwe.reverse()
-
-            # print(qwe[0:10])
-
-            # print(len(data))
 
             temp_delay = 0
             temp_events = data[0]['events']
@@ -390,20 +354,16 @@ class CalculateView(APIView):
                     temp_delay += 1
 
                 if data[i]['vacation_status'] is True and data[i]['academic_course'] != 0:
-                    # print('academic_course != 0')
-                    # print(i, end='\t')
                     temp_data = data[0 + temp_delay:i]
 
                     pop_list = []
                     for j in range(len(temp_data) - 1):
-                        # print(-j - 1, end=' ')
                         if temp_data[-j - 1]['vacation_status'] is True:
                             pop_list.append(-j - 1)
 
                     for pop_el in pop_list:
                         temp_data.pop(pop_el)
 
-                    # print('\n')
                     if len(temp_data) > 10:
                         temp_data.reverse()
                         temp_data = temp_data[0:10]
@@ -412,26 +372,12 @@ class CalculateView(APIView):
                     for el in temp_data:
                         temp_sum += el['salary']
                     temp_salary = int(temp_sum / len(temp_data))
-                    # print(temp_salary)
                     data[i]['vacation_salary'] = temp_salary
 
             data = data[temp_delay:len(data)]
 
             data[0]['events'] = temp_events
 
-            # flag_of_first_vacation = False
-            # for i in range(len(data)):
-            #     if data[i]['salary'] == 0:
-            #         temp_data = data[0:i - 1]
-            #         for el in temp_data:
-            #             if el['salary'] == 0:
-            #                 temp_data.remove(el)
-            #         temp_sum = 0
-            #         for el in temp_data:
-            #             temp_sum += el['salary']
-            #         temp_salary = int(temp_sum / len(temp_data))
-            #         print(temp_salary)
             return Response(data)
         except:
-            # raise
             return Response({"error_message": "BAD REQUEST", "status": status.HTTP_400_BAD_REQUEST})
