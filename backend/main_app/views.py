@@ -1,10 +1,6 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from .models import *
 from datetime import datetime
-import os
-from django.views.generic.base import View
-from django.http import HttpResponse
 from rest_framework import status
 
 MONTHS = [
@@ -67,7 +63,7 @@ class CalculateView(APIView):
 
     def get_user_age_group(self, temp_date, date_of_birth):
         temp_age = temp_date - date_of_birth
-        temp_age_days = temp_age.days - 30  # округление в меньшую
+        temp_age_days = temp_age.days - 30  # rounding down
 
         if temp_age_days < (365 * 31):
             age_group = 0
@@ -154,12 +150,6 @@ class CalculateView(APIView):
                 date_of_dissertation=datetime.strptime(request.data['date_of_dissertation'], '%Y-%m-%d'),
                 date_of_birth=datetime.strptime(request.data['date_of_birth'], '%Y-%m-%d')
             )
-            print(user.academic_status)
-            print(user.academic_course)
-            print(user.date_of_registration)
-            print(user.work_experience)
-            print(user.date_of_dissertation)
-            print(user.date_of_birth)
 
             flag_of_registration = False
             flag_of_work_experience = False
@@ -181,22 +171,22 @@ class CalculateView(APIView):
             if user.academic_status == 'Bachelor' and user.academic_course == 6:
                 user.academic_status = 'Master'
                 user.academic_course = 0
-            elif user.academic_status == 'Master' and user.academic_course == 6:
-                # user.academic_status = 'Master'
-                # user.academic_course = 2
-                pass
-            elif user.academic_status == 'Specialist' and user.academic_course == 6:
-                # user.academic_status = 'Specialist'
-                # user.academic_course = 5
-                # user.academic_status = 'PreCandidate'
-                # user.academic_course = 1
-                pass
+            # elif user.academic_status == 'Master' and user.academic_course == 6:
+            #     # user.academic_status = 'Master'
+            #     # user.academic_course = 2
+            #     pass
+            # elif user.academic_status == 'Specialist' and user.academic_course == 6:
+            #     # user.academic_status = 'Specialist'
+            #     # user.academic_course = 5
+            #     # user.academic_status = 'PreCandidate'
+            #     # user.academic_course = 1
+            #     pass
             elif user.academic_status == 'PreCandidate' and user.academic_course == 6:
                 user.academic_course = None
 
             '''
-            1) вычислим статус на момент регистрации
-            2) вычислим карьеру с момента регистрации
+            1) calculate the status at the time of registration
+            2) calculate the career from the moment of registration
             '''
 
             data = list()
@@ -224,17 +214,16 @@ class CalculateView(APIView):
 
             current_year = datetime.now().year
             current_month = datetime.now().month
-            # current_day = datetime.now().day
             current_day = 15
 
             for i in range(all_time):
                 temp_date = datetime.strptime(f'{current_year}-{current_month}-{current_day}', '%Y-%m-%d')
 
-                if temp_date < user.date_of_registration:
-                    print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
-                else:
-                    print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}',
-                          end='\t')
+                # if temp_date < user.date_of_registration:
+                #     print(f'(b){temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}')
+                # else:
+                #     print(f'{temp_date.year} {temp_date.month}\t{user.academic_course} {user.academic_status}',
+                #           end='\t')
 
                 if temp_date > user.date_of_registration:
 
@@ -242,7 +231,6 @@ class CalculateView(APIView):
                     events += prev_events
                     prev_events = []
 
-                    # print(self.get_user_position(user, temp_date))
                     if user.academic_status != 'Bachelor' and user.academic_status != 'Specialist' \
                             or user.academic_status == 'Specialist' and user.academic_course == 6:
                         if flag_of_registration is False:
@@ -326,9 +314,9 @@ class CalculateView(APIView):
                         'vacation_salary': month_data['vacation_salary'],
                     })
 
-                    print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
-                          month_data['status_of_dissertation'], month_data['vacation_status'], month_data['salary'],
-                          self.get_user_position(user, temp_date), month_data['events'])
+                    # print(month_data['status_of_work_experience'], month_data['status_of_age_group'],
+                    #       month_data['status_of_dissertation'], month_data['vacation_status'], month_data['salary'],
+                    #       self.get_user_position(user, temp_date), month_data['events'])
                     if (current_month == 7 or current_month == 8) and user.academic_status == 'Master':
                         pass
                     else:
@@ -384,14 +372,14 @@ class CalculateView(APIView):
             # for i in range(all_time):
             #     pass
 
-            print('------------------------')
+            # print('------------------------')
 
             # qwe = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
             # qwe.reverse()
 
             # print(qwe[0:10])
 
-            print(len(data))
+            # print(len(data))
 
             temp_delay = 0
             temp_events = data[0]['events']
@@ -402,7 +390,7 @@ class CalculateView(APIView):
                     temp_delay += 1
 
                 if data[i]['vacation_status'] is True and data[i]['academic_course'] != 0:
-                    print('academic_course != 0')
+                    # print('academic_course != 0')
                     # print(i, end='\t')
                     temp_data = data[0 + temp_delay:i]
 
@@ -445,5 +433,5 @@ class CalculateView(APIView):
             #         print(temp_salary)
             return Response(data)
         except:
-            raise
+            # raise
             return Response({"error_message": "BAD REQUEST", "status": status.HTTP_400_BAD_REQUEST})
