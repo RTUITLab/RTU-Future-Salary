@@ -7,6 +7,8 @@ services:
     command: sh -c "pip install -r requirements.txt && python3 manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8080 project.wsgi"
     expose:
       - 8080
+    environment:
+      - SECRET_KEY=r#l+(jiyg2m7d!f8(-zo2o2rsc@b%dq4jm=_fg3$ghir5fxf6e
 #    ports:
 #      - 80:8080
   salary_frontend:
