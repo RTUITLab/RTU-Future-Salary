@@ -17,6 +17,8 @@ services:
     command: npm run-script build
     volumes:
       - salary_build_folder:/frontend/build
+    environment:
+      - REACT_APP_PRODUCTION_URL=http://127.0.0.1:8000/
   salary_nginx:
 #    image: nginx:latest
     build:
