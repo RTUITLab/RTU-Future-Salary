@@ -24,7 +24,15 @@ services:
       - SECRET_KEY=NEW_DJANGO_SECRET_KEY
 ```
 
-3. Launch project
+3. Put your PRODUCTION_URL to salary_frontend service as YOUR_PRODUCTION_URL environment variable
+```
+services:
+  salary_frontend:
+    environment:
+      - REACT_APP_PRODUCTION_URL=http://YOUR_PRODUCTION_URL:8000/
+```
+
+4. Launch project
 
 ```
 docker-compose up
