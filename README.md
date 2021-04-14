@@ -24,6 +24,12 @@ services:
       - SECRET_KEY=NEW_DJANGO_SECRET_KEY
 ```
 
+3. Launch project
+
+`docker-compose up`
+
+> Done! Project launched on 8000 port!
+
 ## Launching project in developing
 #### Git, Docker and Docker Compose must be installed
 
