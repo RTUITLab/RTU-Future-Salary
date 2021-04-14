@@ -1,7 +1,7 @@
 # SALARY-PROJECT
 💸 Core backend service for open-source "Salary" project for RTUITLab
 
-## Launching project in production
+## Launching project in production mode
 #### Git, Docker and Docker Compose must be installed
 
 1. Clone project with submodules
@@ -32,7 +32,10 @@ docker-compose up
 
 > Done! Project launched on 8000 port!
 
-## Launching project in developing
+## Launching project in developing mode
+
+> Coming soon
+<!---
 #### Git, Docker and Docker Compose must be installed
 
 4. Create `.env` file in the directory named `backend` and add your new django secret key to it
@@ -56,5 +59,5 @@ Note: if you want to launch project locally, set REACT_APP_PRODUCTION_URL = "htt
 > Done! Project launched on 8000 port!
 
 ![Main page](https://github.com/AlexGeniusMan/SALARY-PROJECT/blob/master/readme-images/main.png?raw=true)
-
-This project was made by Dev.gang.
+-->
+This project was made by RealityGang.
