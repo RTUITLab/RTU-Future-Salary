@@ -70,4 +70,4 @@ Note: if you want to launch project locally, set REACT_APP_PRODUCTION_URL = "htt
 
 ![Main page](https://github.com/AlexGeniusMan/SALARY-PROJECT/blob/master/readme-images/main.png?raw=true)
 
-This project was made by RealityGang.
+This project was made by RealityGang - team of @RTUITLab.
