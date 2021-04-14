@@ -1,21 +1,31 @@
 # SALARY-PROJECT
 💸 Core backend service for open-source "Salary" project for RTUITLab
 
-## Launching project
+## Launching project in production
 #### Git, Docker and Docker Compose must be installed
 
-1. Clone backend
+1. Clone project with submodules
 
-`git clone https://github.com/AlexGeniusMan/SALARY-PROJECT salary`
+```
+git clone https://github.com/AlexGeniusMan/SALARY-PROJECT salary
+cd salary
+git submodule init
+git submodule update
+```
 
-2. Open project directory
+2. Generate new DJANGO_SECRET_KEY and paste it to salary_backend service as SECRET_KEY environment variable
 
-`cd salary`
+> To generate new DJANGO_SECRET_KEY use this instruction: https://stackoverflow.com/a/57678930/14355198
 
-3. Clone frontend
+```
+services:
+  salary_backend:
+    environment:
+      - SECRET_KEY=NEW_DJANGO_SECRET_KEY
+```
 
-`git clone https://github.com/Zayac11/Salary frontend`
-
+## Launching project in developing
+#### Git, Docker and Docker Compose must be installed
 
 4. Create `.env` file in the directory named `backend` and add your new django secret key to it
 
