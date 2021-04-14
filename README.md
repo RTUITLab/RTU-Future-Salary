@@ -1,5 +1,5 @@
 # SALARY-PROJECT
-💸 Core backend service for open-source "Salary" project for RTUITLab
+💸 Salary is a web service that allows you to calculate guaranteed payments to faculty members at RTU MIREA
 
 ## Launching project in production mode
 #### Git, Docker and Docker Compose must be installed
