@@ -8,7 +8,8 @@ services:
     expose:
       - 8080
     environment:
-      - SECRET_KEY=r#l+(jiyg2m7d!f8(-zo2o2rsc@b%dq4jm=_fg3$ghir5fxf6e
+      - DEBUG=False
+      - SECRET_KEY=DJANGO_APP_PRODUCTION_URL
 #    ports:
 #      - 80:8080
   salary_frontend:
