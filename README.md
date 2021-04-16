@@ -35,7 +35,7 @@ services:
 4. Launch project
 
 ```
-docker-compose up
+docker-compose up --build
 ```
 
 > Done! Project launched on 8000 port!
