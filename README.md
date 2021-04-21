@@ -7,7 +7,7 @@
 1. Clone project with submodules
 
 ```
-git clone https://github.com/AlexGeniusMan/SALARY-PROJECT salary
+git clone https://github.com/RTUITLab/RTU-Future-Salary salary
 cd salary
 git submodule init
 git submodule update
