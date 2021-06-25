@@ -371,7 +371,10 @@ class CalculateView(APIView):
                     temp_sum = 0
                     for el in temp_data:
                         temp_sum += el['salary']
-                    temp_salary = int(temp_sum / len(temp_data))
+                    if len(temp_data) == 0:
+                        temp_salary = 0
+                    else:
+                        temp_salary = int(temp_sum / len(temp_data))
                     data[i]['vacation_salary'] = temp_salary
 
             data = data[temp_delay:len(data)]
@@ -380,4 +383,5 @@ class CalculateView(APIView):
 
             return Response(data)
         except:
+            raise
             return Response({"error_message": "BAD REQUEST", "status": status.HTTP_400_BAD_REQUEST})
