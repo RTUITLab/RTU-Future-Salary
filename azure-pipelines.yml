@@ -39,7 +39,7 @@ stages:
         displayName: Build backend image for docker hub
         inputs:
           containerRegistry: 'rtuitlab connection by admin'
-          repository: 'rtuitlab/salary-back'
+          repository: 'salary/salary-back'
           command: 'buildAndPush'
           Dockerfile: '$(Build.SourcesDirectory)/backend/Dockerfile'
           buildContext: '$(Build.SourcesDirectory)/backend'
@@ -48,7 +48,7 @@ stages:
         displayName: Build proxy image for docker hub
         inputs:
           containerRegistry: 'rtuitlab connection by admin'
-          repository: 'rtuitlab/salary-proxy'
+          repository: 'salary/salary-proxy'
           command: 'buildAndPush'
           Dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
           buildContext: '$(Build.SourcesDirectory)/nginx'
@@ -59,7 +59,7 @@ stages:
         displayName: Build backend image for private docker registry
         inputs:
           containerRegistry: 'private rtuitlab registry'
-          repository: 'rtuitlab/salary-back'
+          repository: 'salary/salary-back'
           command: 'buildAndPush'
           Dockerfile: '$(Build.SourcesDirectory)/backend/Dockerfile'
           buildContext: '$(Build.SourcesDirectory)/backend'
@@ -68,7 +68,7 @@ stages:
         displayName: Build proxy image for private docker registry
         inputs:
           containerRegistry: 'private rtuitlab registry'
-          repository: 'rtuitlab/salary-proxy'
+          repository: 'salary/salary-proxy'
           command: 'buildAndPush'
           Dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
           buildContext: '$(Build.SourcesDirectory)/nginx'
@@ -90,7 +90,7 @@ stages:
               inputs:
                 sshEndpoint: 'swarm manager'
                 runOptions: 'commands'
-                commands: 'docker service update --image registry.rtuitlab.dev/rtuitlab/salary-back:$(Build.BuildId) ${{variables.serviceNameBack}} --with-registry-auth'
+                commands: 'docker service update --image registry.rtuitlab.dev/salary/salary-back:$(Build.BuildId) ${{variables.serviceNameBack}} --with-registry-auth'
                 readyTimeout: '20000'
   - deployment: DeployProxy
     pool:
@@ -105,5 +105,5 @@ stages:
               inputs:
                 sshEndpoint: 'swarm manager'
                 runOptions: 'commands'
-                commands: 'docker service update --image registry.rtuitlab.dev/rtuitlab/salary-proxy:$(Build.BuildId) ${{variables.serviceNameProxy}} --with-registry-auth'
+                commands: 'docker service update --image registry.rtuitlab.dev/salary/salary-proxy:$(Build.BuildId) ${{variables.serviceNameProxy}} --with-registry-auth'
                 readyTimeout: '20000'
