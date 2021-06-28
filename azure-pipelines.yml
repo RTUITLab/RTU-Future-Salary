@@ -39,7 +39,7 @@ stages:
         displayName: Build backend image for docker hub
         inputs:
           containerRegistry: 'rtuitlab connection by admin'
-          repository: 'salary/salary-back'
+          repository: 'rtuitlab/salary-back'
           command: 'buildAndPush'
           Dockerfile: '$(Build.SourcesDirectory)/backend/Dockerfile'
           buildContext: '$(Build.SourcesDirectory)/backend'
@@ -48,7 +48,7 @@ stages:
         displayName: Build proxy image for docker hub
         inputs:
           containerRegistry: 'rtuitlab connection by admin'
-          repository: 'salary/salary-proxy'
+          repository: 'rtuitlab/salary-proxy'
           command: 'buildAndPush'
           Dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
           buildContext: '$(Build.SourcesDirectory)/nginx'
