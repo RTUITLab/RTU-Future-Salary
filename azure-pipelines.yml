@@ -1,0 +1,108 @@
+trigger:
+- master
+
+resources:
+- repo: self
+
+pool:
+  vmImage: ubuntu-latest
+
+name: $(BuildID)-$(Build.SourceBranchName)
+
+variables:
+  ${{ if notIn(variables['Build.SourceBranchName'], 'master') }}:
+    buildImage: false
+    deployService: false
+    deployEnvironment: 'no'
+    imageTags: 'no'
+    serviceNameBack: 'no'
+    serviceNameProxy: 'no'
+  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+    buildImage: true
+    deployService: true
+    deployEnvironment: production
+    imageTags: |
+      $(Build.BuildId)
+      latest
+    serviceNameBack: salary_back
+    serviceNameProxy: salary_proxy
+
+stages:
+- stage: PackInDocker
+  displayName: Build docker image
+  condition: and(succeeded(), ${{variables.buildImage}})
+  jobs:
+  - job: Public
+    steps:
+      - task: Docker@2
+        displayName: Build backend image for docker hub
+        inputs:
+          containerRegistry: 'rtuitlab connection by admin'
+          repository: 'rtuitlab/salary-back'
+          command: 'buildAndPush'
+          Dockerfile: '$(Build.SourcesDirectory)/backend/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)/backend'
+          tags: ${{variables.imageTags}}
+      - task: Docker@2
+        displayName: Build proxy image for docker hub
+        inputs:
+          containerRegistry: 'rtuitlab connection by admin'
+          repository: 'rtuitlab/salary-proxy'
+          command: 'buildAndPush'
+          Dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)/nginx'
+          tags: ${{variables.imageTags}}
+  - job: Private
+    steps:
+      - task: Docker@2
+        displayName: Build backend image for private docker registry
+        inputs:
+          containerRegistry: 'private rtuitlab registry'
+          repository: 'rtuitlab/salary-back'
+          command: 'buildAndPush'
+          Dockerfile: '$(Build.SourcesDirectory)/backend/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)/backend'
+          tags: ${{variables.imageTags}}
+      - task: Docker@2
+        displayName: Build proxy image for private docker registry
+        inputs:
+          containerRegistry: 'private rtuitlab registry'
+          repository: 'rtuitlab/salary-proxy'
+          command: 'buildAndPush'
+          Dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)/nginx'
+          tags: ${{variables.imageTags}}
+- stage: UpdateService
+  displayName: Update service
+  condition: and(succeeded(), ${{variables.deployService}})
+  jobs:
+  - deployment: Deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: ${{variables.deployEnvironment}}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: none
+            - task: SSH@0
+              inputs:
+                sshEndpoint: 'swarm manager'
+                runOptions: 'commands'
+                commands: 'docker service update --image registry.rtuitlab.dev/rtuitlab/salary-back:$(Build.BuildId) ${{variables.serviceNameBack}} --with-registry-auth'
+                readyTimeout: '20000'
+  - deployment: Deploy
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: ${{variables.deployEnvironment}}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: none
+            - task: SSH@0
+              inputs:
+                sshEndpoint: 'swarm manager'
+                runOptions: 'commands'
+                commands: 'docker service update --image registry.rtuitlab.dev/rtuitlab/salary-proxy:$(Build.BuildId) ${{variables.serviceNameProxy}} --with-registry-auth'
+                readyTimeout: '20000'
