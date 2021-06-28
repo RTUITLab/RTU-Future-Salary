@@ -11,14 +11,14 @@ pool:
 name: $(BuildID)-$(Build.SourceBranchName)
 
 variables:
-  ${{ if notIn(variables['Build.SourceBranchName'], 'master') }}:
+  ${{ if notIn(variables['Build.SourceBranchName'], 'master', 'azure-pipelines') }}:
     buildImage: false
     deployService: false
     deployEnvironment: 'no'
     imageTags: 'no'
     serviceNameBack: 'no'
     serviceNameProxy: 'no'
-  ${{ if eq(variables['Build.SourceBranchName'], 'master') }}:
+  ${{ if eq(variables['Build.SourceBranchName'], 'master', 'azure-pipelines') }}:
     buildImage: true
     deployService: true
     deployEnvironment: production
