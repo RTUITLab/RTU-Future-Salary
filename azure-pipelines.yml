@@ -45,19 +45,21 @@ stages:
           fileoverwrite: true
           endWithNewLine: true
       - task: Npm@1
+        displayName: npm ci
         inputs:
           command: 'ci'
           workingDir: './frontend'
       - task: Npm@1
+        displayName: npm run build
         inputs:
           command: 'custom'
           workingDir: './frontend'
           customCommand: 'run build'
       - task: CopyFiles@2
         inputs:
-          SourceFolder: './frontend/build'
+          SourceFolder: '$(Build.SourcesDirectory)/frontend/build'
           Contents: '**'
-          TargetFolder: './nginx/www'
+          TargetFolder: '$(Build.SourcesDirectory)/nginx/www'
 - stage: PackInDocker
   displayName: Build docker image
   condition: and(succeeded(), ${{variables.buildImage}})
