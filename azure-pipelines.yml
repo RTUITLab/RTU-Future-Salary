@@ -48,6 +48,11 @@ stages:
         inputs:
           command: 'ci'
           workingDir: './frontend'
+      - task: Npm@1
+        inputs:
+          command: 'custom'
+          workingDir: './frontend'
+          customCommand: 'run build'
       - task: CopyFiles@2
         inputs:
           SourceFolder: './frontend/build'
