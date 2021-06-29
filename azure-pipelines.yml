@@ -27,8 +27,32 @@ variables:
       latest
     serviceNameBack: salary_back
     serviceNameProxy: salary_proxy
+    serviceNameFront: salary_front
 
 stages:
+- stage: PreBuild
+  displayName: Pre Build
+  jobs:
+  - job: PreBuild
+    displayName: Pre Build
+    steps:
+      - checkout: self
+        submodules: true
+      - task: file-creator@6
+        inputs:
+          filepath: './frontend/.env'
+          filecontent: 'REACT_APP_PRODUCTION_URL=https://salary.rtuitlab.dev/'
+          fileoverwrite: true
+          endWithNewLine: true
+      - task: Npm@1
+        inputs:
+          command: 'ci'
+          workingDir: './frontend'
+      - task: CopyFiles@2
+        inputs:
+          SourceFolder: './frontend/build'
+          Contents: '**'
+          TargetFolder: './nginx/www'
 - stage: PackInDocker
   displayName: Build docker image
   condition: and(succeeded(), ${{variables.buildImage}})
@@ -50,8 +74,17 @@ stages:
           containerRegistry: 'rtuitlab connection by admin'
           repository: 'rtuitlab/salary-proxy'
           command: 'buildAndPush'
-          Dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
+          Dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile_1'
           buildContext: '$(Build.SourcesDirectory)/nginx'
+          tags: ${{variables.imageTags}}
+      - task: Docker@2
+        displayName: Build front image for docker hub
+        inputs:
+          containerRegistry: 'rtuitlab connection by admin'
+          repository: 'rtuitlab/salary-front'
+          command: 'buildAndPush'
+          Dockerfile: '$(Build.SourcesDirectory)/frontend/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)/frontend'
           tags: ${{variables.imageTags}}
   - job: Private
     steps:
@@ -70,8 +103,17 @@ stages:
           containerRegistry: 'private rtuitlab registry'
           repository: 'salary/salary-proxy'
           command: 'buildAndPush'
-          Dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile'
+          Dockerfile: '$(Build.SourcesDirectory)/nginx/Dockerfile_1'
           buildContext: '$(Build.SourcesDirectory)/nginx'
+          tags: ${{variables.imageTags}}
+      - task: Docker@2
+        displayName: Build frontend image for private docker registry
+        inputs:
+          containerRegistry: 'private rtuitlab registry'
+          repository: 'salary/salary-front'
+          command: 'buildAndPush'
+          Dockerfile: '$(Build.SourcesDirectory)/frontend/Dockerfile'
+          buildContext: '$(Build.SourcesDirectory)/frontend'
           tags: ${{variables.imageTags}}
 - stage: UpdateService
   displayName: Update service
@@ -106,4 +148,19 @@ stages:
                 sshEndpoint: 'swarm manager'
                 runOptions: 'commands'
                 commands: 'docker service update --image registry.rtuitlab.dev/salary/salary-proxy:$(Build.BuildId) ${{variables.serviceNameProxy}} --with-registry-auth'
+                readyTimeout: '20000'
+  - deployment: DeployFront
+    pool:
+      vmImage: 'ubuntu-latest'
+    environment: ${{variables.deployEnvironment}}
+    strategy:
+      runOnce:
+        deploy:
+          steps:
+            - download: none
+            - task: SSH@0
+              inputs:
+                sshEndpoint: 'swarm manager'
+                runOptions: 'commands'
+                commands: 'docker service update --image registry.rtuitlab.dev/salary/salary-front:$(Build.BuildId) ${{variables.serviceNameFront}} --with-registry-auth'
                 readyTimeout: '20000'
