@@ -1,7 +1,7 @@
 version: '3.7'
 
 services:
-  salary_backend:
+  back:
     build:
       context: ./backend
     command: sh -c "python3 manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8080 project.wsgi"
@@ -10,7 +10,7 @@ services:
     environment:
       - DEBUG=False
       - SECRET_KEY=DJANGO_SECRET_KEY
-  salary_frontend:
+  front:
     build:
       context: ./frontend
     command: npm run-script build
@@ -18,7 +18,7 @@ services:
       - salary_build_folder:/frontend/build
     environment:
       - REACT_APP_PRODUCTION_URL=http://YOUR_PRODUCTION_URL:8000/
-  salary_nginx:
+  proxy:
     build:
       context: ./nginx
     ports:
@@ -26,7 +26,7 @@ services:
     volumes:
       - salary_build_folder:/var/www/frontend
     depends_on:
-      - salary_backend
-      - salary_frontend
+      - back
+      - front
 volumes:
   salary_build_folder:
