@@ -47,4 +47,4 @@ Demonstration: https://youtu.be/CYeBP6JI1FY
 
 ![Main page](https://github.com/AlexGeniusMan/SALARY-PROJECT/blob/master/readme-images/main.png?raw=true)
 
-This project was made by RealityGang - team of RTU IT Lab.
+This project was made by RealityX - team of RTUITLab.
