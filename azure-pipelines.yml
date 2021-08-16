@@ -76,7 +76,7 @@ stages:
   displayName: Update service
   condition: and(succeeded(), ${{variables.deployService}})
   jobs:
-  - deployment: Deploy
+  - deployment: DeployBack
     pool:
       vmImage: 'ubuntu-latest'
     environment: ${{variables.deployEnvironment}}
@@ -91,7 +91,7 @@ stages:
                 runOptions: 'commands'
                 commands: 'docker service update --image registry.rtuitlab.dev/rtuitlab/salary-back:$(Build.BuildId) ${{variables.serviceNameBack}} --with-registry-auth'
                 readyTimeout: '20000'
-  - deployment: Deploy
+  - deployment: DeployProxy
     pool:
       vmImage: 'ubuntu-latest'
     environment: ${{variables.deployEnvironment}}
