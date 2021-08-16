@@ -4,7 +4,7 @@ services:
   salary_backend:
     build:
       context: ./backend
-    command: sh -c "pip install -r requirements.txt && python3 manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8080 project.wsgi"
+    command: sh -c "python3 manage.py collectstatic --noinput && gunicorn --bind 0.0.0.0:8080 project.wsgi"
     expose:
       - 8080
     environment:
